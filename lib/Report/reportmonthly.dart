@@ -26,18 +26,43 @@ class ReportPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('REPORT'),
+        title: const Text(
+          'REPORT',
+          style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Urbanist'),
+        ),
         centerTitle: true,
         toolbarHeight: 100,
         backgroundColor: Colors.white,
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 16.0), // Padding untuk memposisikan text ke pojok kanan
-            child: Center(
-              child: Text(
-                '08:00', // Text di pojok kanan
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
+            padding:
+                const EdgeInsets.only(right: 16.0), // Adjust padding as needed
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment:
+                  CrossAxisAlignment.end, // Align text to the right
+              children: const [
+                Text(
+                  '17:19',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black, // Adjust color for visibility
+                  ),
+                ),
+                Text(
+                  'Wednesday, 11 Feb',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'Inter',
+                    color: Colors.black, // Adjust color for visibility
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -55,54 +80,115 @@ class ReportPage extends StatelessWidget {
               ),
             ),
             alignment: Alignment.center,
-            child: const Text(
-              'February 2024',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 24,
-                fontWeight: FontWeight.w400,
+            child: Container(
+              width: double.infinity,
+              height: 51,
+              decoration: BoxDecoration(
+                color: Color(0xFFF2BC),
+                border: Border.all(
+                  color: Colors.black.withOpacity(0.1),
+                  width: 1,
+                ),
               ),
-            ),
-          ),
-             Container(
-              color: Color(0x56FFD83A), // Background color for the row
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              alignment: Alignment.center,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  Text('Date', style: TextStyle(fontSize: 16)),
-                  Text('Clock In', style: TextStyle(fontSize: 16)),
-                  Text('Clock Out', style: TextStyle(fontSize: 16)),
-                  Text('Activity', style: TextStyle(fontSize: 16)),
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios_new),
+                    color: Colors.black,
+                    onPressed: () {
+                      // Add your back action here
+                    },
+                  ),
+                  Text(
+                    'February 2024',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontFamily: 'Inter',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.arrow_forward_ios),
+                    color: Colors.black,
+                    onPressed: () {
+                      // Add your next action here
+                    },
+                  ),
                 ],
               ),
             ),
+          ),
+          Container(
+            color: Color(0x56FFD83A), // Background color for the row
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                Text('Date',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    )),
+                Text('Clock In',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    )),
+                Text('Clock Out',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    )),
+                Text('Activity',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'Inter',
+                    )),
+              ],
+            ),
+          ),
 
-            const SizedBox(height: 15),
+          const SizedBox(height: 30),
           // Add more content here for rows, etc.
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: const [
                 Text('11', style: TextStyle(fontSize: 16)),
-                Text('08:59', style: TextStyle(fontSize: 16)),
+                Text('08:59',
+                    style: TextStyle(
+                      color: Color(0xFF09740E),
+                      fontSize: 16,
+                    )),
                 Text('17:02', style: TextStyle(fontSize: 16)),
                 Text('Update Data', style: TextStyle(fontSize: 16)),
               ],
             ),
           ),
-          
-            const SizedBox(height: 15),
 
-           Padding(
+          const SizedBox(height: 30),
+
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: const [
                 Text('10', style: TextStyle(fontSize: 16)),
-                Text('08:54', style: TextStyle(fontSize: 16)),
+                Text('09:21',
+                    style: TextStyle(
+                      color: Color(0xFF9A1212),
+                      fontSize: 16,
+                    )),
                 Text('17:02', style: TextStyle(fontSize: 16)),
                 Text('Update Data', style: TextStyle(fontSize: 16)),
               ],
@@ -111,7 +197,7 @@ class ReportPage extends StatelessWidget {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.assessment),
             label: 'Report',
