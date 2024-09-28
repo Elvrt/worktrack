@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worktrack/Report/reportmonthly.dart';
 
 void main() {
   runApp(const ReportDeail());
@@ -10,7 +11,7 @@ class ReportDeail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const ReportPage(),
+      home: const ReportDetail(),
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -18,8 +19,8 @@ class ReportDeail extends StatelessWidget {
   }
 }
 
-class ReportPage extends StatelessWidget {
-  const ReportPage({super.key});
+class ReportDetail extends StatelessWidget {
+  const ReportDetail({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +42,10 @@ class ReportPage extends StatelessWidget {
           icon: Icon(Icons.arrow_back),
           color: Colors.black, // Adjust the color of the icon
           onPressed: () {
-            // Add your back action here
+            Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => reportmonthly()));
           },
         ),
         actions: [
@@ -260,10 +264,9 @@ class ReportPage extends StatelessWidget {
                   left: 258,
                   top: 20,
                   child: Text(
-                    '08:59',
+                    '17:02',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFF0A750E),
                       fontSize: 14,
                       fontFamily: 'Urbanist',
                       fontWeight: FontWeight.w400,

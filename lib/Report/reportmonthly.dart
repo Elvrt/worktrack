@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:worktrack/Report/reportdetail.dart';
 
 void main() {
   runApp(const reportmonthly());
@@ -159,19 +160,29 @@ class ReportPage extends StatelessWidget {
           // Add more content here for rows, etc.
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                Text('11', style: TextStyle(fontSize: 16)),
-                Text('08:59',
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ReportDetail()),
+                );
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  Text('11', style: TextStyle(fontSize: 16)),
+                  Text(
+                    '08:59',
                     style: TextStyle(
                       color: Color(0xFF09740E),
                       fontSize: 16,
-                    )),
-                Text('17:02', style: TextStyle(fontSize: 16)),
-                Text('Update Data', style: TextStyle(fontSize: 16)),
-              ],
+                    ),
+                  ),
+                  Text('17:02', style: TextStyle(fontSize: 16)),
+                  Text('Update Data', style: TextStyle(fontSize: 16)),
+                ],
+              ),
             ),
           ),
 
