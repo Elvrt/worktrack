@@ -19,10 +19,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true, // Extend the body behind the AppBar
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -33,13 +35,14 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            SizedBox(height: kToolbarHeight), // Space for the AppBar height
             // Profile Info
             Row(
               children: [
                 CircleAvatar(
                   radius: 20,
                   backgroundImage: NetworkImage(
-                    'https://via.placeholder.com/150', // Ganti dengan URL gambar profil
+                    'https://via.placeholder.com/150', // Replace with profile image URL
                   ),
                 ),
                 SizedBox(width: 10),
@@ -48,8 +51,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       'BONIFASIUS',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       '1231231',
@@ -90,7 +92,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 InkWell(
                   onTap: () {
-                    // Navigasi ke halaman ClockInPage
+                    // Navigate to ClockInPage
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => ClockInPage()),
@@ -105,8 +107,7 @@ class HomeScreen extends StatelessWidget {
                         Icon(Icons.face, size: 48),
                         Text(
                           'CLOCK IN',
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -117,7 +118,7 @@ class HomeScreen extends StatelessWidget {
                   right: 0,
                   child: InkWell(
                     onTap: () {
-                      // Implementasi fungsi Take Time Off
+                      // Implement Take Time Off function
                       _showMessage(context, 'Take Time Off berhasil');
                     },
                     child: CircleAvatar(
@@ -197,7 +198,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Untuk menandai tab yang aktif
+        currentIndex: 1, // Mark active tab
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_today),
@@ -216,7 +217,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk menampilkan pesan SnackBar
+  // Function to show SnackBar message
   void _showMessage(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -225,22 +226,23 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Fungsi untuk format waktu (hh:mm:ss)
+  // Function to format time (hh:mm:ss)
   String _formatTime(DateTime dateTime) {
     return "${_twoDigits(dateTime.hour)} : ${_twoDigits(dateTime.minute)}";
   }
 
-  // Fungsi untuk format tanggal (hari, bulan tanggal)
+  // Function to format date (day, month date)
   String _formatDate(DateTime dateTime) {
     return DateFormat('EEEE, MMM d').format(dateTime);
   }
 
-  // Helper untuk memastikan dua digit pada jam dan menit
+  // Helper to ensure two digits for hours and minutes
   String _twoDigits(int n) {
     if (n >= 10) return "$n";
     return "0$n";
   }
 }
+
 
 class ClockInPage extends StatelessWidget {
   @override
