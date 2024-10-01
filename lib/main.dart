@@ -242,7 +242,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Halaman baru untuk Clock In
 class ClockInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -257,7 +256,7 @@ class ClockInPage extends StatelessWidget {
           },
         ),
         flexibleSpace: Padding(
-          padding: const EdgeInsets.all(16.0), // Add padding here
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -319,16 +318,23 @@ class ClockInPage extends StatelessWidget {
               ),
               SizedBox(height: 30),
               Center(
+                // Wrap the button in a Center widget
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.yellow,
-                    padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   onPressed: () {
-                    // Implement Clock In functionality here
+                    // Navigate to HomePageAfterClockIn
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => HomePageAfterClockIn()),
+                    );
                   },
                   child: Text(
                     'Clock In',
@@ -352,3 +358,307 @@ class ClockInPage extends StatelessWidget {
   }
 }
 
+class HomePageAfterClockIn extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Row(
+          children: [
+            CircleAvatar(
+              backgroundImage: NetworkImage(
+                'https://via.placeholder.com/150', // Replace with profile image URL
+              ),
+            ),
+            SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'BONIFASIUS',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                Text('1231231', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _formatTime(DateTime.now()),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  _formatDate(DateTime.now()),
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(height: 20),
+            Center(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 74,
+                    backgroundColor: Colors.orange,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ClockOutPage()),
+                        );
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.face, size: 48),
+                          SizedBox(
+                              height:
+                                  8), // Add some space between the icon and the text
+                          Text(
+                            'Clock Out',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors
+                                  .white, // Change text color to white for visibility
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 1,
+                    right: 0,
+                    child: CircleAvatar(
+                      radius: 22,
+                      backgroundColor: Colors.grey,
+                      child: Text(
+                        'Take Time Off',
+                        style: TextStyle(fontSize: 8, color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Location: Unknown - Khalid',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Column(
+                  children: [
+                    Icon(Icons.login, size: 40, color: Colors.yellow),
+                    SizedBox(height: 5),
+                    Text('08:56\nClock In', textAlign: TextAlign.center),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Icon(Icons.flag, size: 40, color: Colors.yellow),
+                    SizedBox(height: 5),
+                    Text('Debug ios App\nGoal', textAlign: TextAlign.center),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Icon(Icons.logout, size: 40, color: Colors.yellow),
+                    SizedBox(height: 5),
+                    Text('Clock Out', textAlign: TextAlign.center),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
+            Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey[200],
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    'Event',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('14 Feb 2024', style: TextStyle(fontSize: 16)),
+                      Text('13:00', style: TextStyle(fontSize: 16)),
+                      Text('Meeting with HRD', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 1, // Highlighting the home tab as active
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: 'Report',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime);
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM d').format(dateTime);
+  }
+}
+
+class ClockOutPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+       
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _formatTime(DateTime.now()),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  _formatDate(DateTime.now()),
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 20),
+            Center(
+              child: Text(
+                'Clock Out',
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 30),
+            Text(
+              'Title of Your Activity Today',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Describe Your Activity Today',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              maxLines: 4,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Take a Screenshot of Your Activity (jpg,jpeg,png)',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            TextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 30),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.yellow,
+                  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  // Implement Clock Out functionality here
+                  // You can add your logic for clocking out
+                },
+                child: Text(
+                  'Clock Out',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime);
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM d').format(dateTime);
+  }
+}
