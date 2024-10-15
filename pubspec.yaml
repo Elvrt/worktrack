@@ -62,6 +62,7 @@ flutter:
   assets:
       - img/img1.png
       - img/logo.png
+      - img/camera.png
   #   - images/a_dot_ham.jpeg
   
 
