@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worktrack/profil/infoprofile.dart';
+import 'package:worktrack/navbar.dart';
 
 void main() {
   runApp(EditProfile());
@@ -18,7 +19,7 @@ class EditProfile extends StatelessWidget {
             child: FormScreen(),
           ),
         ),
-        bottomNavigationBar: BottomNavBar(),
+        bottomNavigationBar: BottomNavBar(currentIndex: 2),
       ),
     );
   }
@@ -44,7 +45,7 @@ class FormScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      physics: BouncingScrollPhysics(), // Menambahkan physics untuk scroll halus
+      physics: ClampingScrollPhysics(), // Menambahkan physics untuk scroll halus
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -211,34 +212,6 @@ class FormScreen extends StatelessWidget {
             ),
           ],
         );
-      },
-    );
-  }
-}
-
-class BottomNavBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.assessment),
-          label: 'Report',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
-      ],
-      unselectedItemColor: Color(0xFF9E9E9E),
-      selectedItemColor: Color(0xFFFEDB47),
-      currentIndex: 0, // Set initial index
-      onTap: (int index) {
-        // Handle tab change
       },
     );
   }

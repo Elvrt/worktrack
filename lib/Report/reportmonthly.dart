@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:worktrack/Report/reportdetail.dart';
+import 'package:worktrack/navbar.dart';
 
 void main() {
   runApp(const reportmonthly());
@@ -207,24 +208,7 @@ class ReportPage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.assessment),
-            label: 'Report',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        unselectedItemColor: Color(0xFF9E9E9E),
-        selectedItemColor: Color(0xFFFEDB47),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }

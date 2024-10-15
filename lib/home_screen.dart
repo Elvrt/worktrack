@@ -2,6 +2,7 @@ import 'dart:async'; // Import for Stream and Timer
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'clock_in_page.dart'; // Import ClockInPage
+import 'package:worktrack/navbar.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -202,37 +203,7 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFFFD83A), // Custom yellow color for shade 300
-              Color(0xFFFDF0A1), // Custom yellow color for shade 100
-            ],
-            begin: Alignment.topCenter, // Start of the gradient
-            end: Alignment.bottomCenter, // End of the gradient
-          ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: 1, // Mark active tab
-          selectedItemColor: Colors.yellow, // Color for the selected item
-          unselectedItemColor: Colors.grey, // Color for unselected items
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_today),
-              label: 'Report',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 
