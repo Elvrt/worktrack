@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:worktrack/profil/infoprofile.dart';
+import 'package:worktrack/profil/editprofile.dart';
 
 void main() {
-  runApp(EditProfile());
+  runApp(InfoProfile());
 }
 
-class EditProfile extends StatelessWidget {
+class InfoProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -58,11 +58,6 @@ class FormScreen extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(height: 8),
-            Text(
-              'Change your picture',
-              style: TextStyle(color: Colors.black, fontSize: 14),
-            ),
             SizedBox(height: 20),
 
             _buildField('Name', nameController),
@@ -70,10 +65,8 @@ class FormScreen extends StatelessWidget {
             _buildField('Date of Birth', dateController),
             _buildField('Username', usernameController),
             _buildField('Address', addressController),
-            _buildField('Position', positionController,
-                enabled: false, hasIcon: false),
-            _buildField('Employee Identification Number', numberController,
-                enabled: false, hasIcon: false),
+            _buildField('Position', positionController,),
+            _buildField('Employee Identification Number', numberController),
 
             // Tombol Confirm dan Cancel
             Row(
@@ -81,33 +74,21 @@ class FormScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // Tampilkan dialog konfirmasi saat tombol Confirm ditekan
-                    _showConfirmationDialog(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => EditProfile()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF37AD46),
+                    backgroundColor: Color(0xFFFFD83A),
+                    fixedSize: Size(174, 40),
                   ),
                   child: Text(
-                    'Confirm',
+                    'Edit Profile',
                     style: TextStyle(color: Color(0xFFFFFFFF)),
                   ),
                 ),
                 SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => InfoProfile()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFE9433F),
-                  ),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: Color(0xFFFFFFFF)),
-                  ),
-                ),
               ],
             ),
             SizedBox(height: 25), // Jarak dengan BottomNavBar
@@ -118,8 +99,7 @@ class FormScreen extends StatelessWidget {
   }
 
   // Fungsi untuk membangun TextField dengan label
-  Widget _buildField(String label, TextEditingController controller,
-      {bool enabled = true, bool hasIcon = true}) {
+  Widget _buildField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -136,7 +116,7 @@ class FormScreen extends StatelessWidget {
           width: 350,
           child: TextField(
             controller: controller,
-            enabled: enabled, // Mengatur apakah field bisa diinput atau tidak
+            enabled: false, // Mengatur apakah field bisa diinput atau tidak
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -151,67 +131,14 @@ class FormScreen extends StatelessWidget {
               ),
               filled: true,
               fillColor: Color(0xFFFFFFFF),
-              suffixIcon: hasIcon
-                  ? Icon(Icons.edit, color: Colors.black)
-                  : null, // Ikon pensil di sebelah kanan
             ),
             style: TextStyle(
                 color:
-                    Colors.black),
+                    Colors.black), 
           ),
         ),
         SizedBox(height: 16), // Jarak antar field
       ],
-    );
-  }
-
-  // Fungsi untuk menampilkan dialog konfirmasi
-  void _showConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            'Confirm Your Change',
-          ),
-          content: SizedBox(height: 20),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => InfoProfile()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF37AD46),
-                  ),
-                  child: Text(
-                    'Confirm',
-                    style: TextStyle(color: Color(0xFFFFFFFF)),
-                  ),
-                ),
-                SizedBox(width: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Tutup dialog
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFE9433F),
-                  ),
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: Color(0xFFFFFFFF)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
     );
   }
 }
