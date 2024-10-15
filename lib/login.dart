@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'karyawan.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,7 +13,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _rememberMe = false; // Untuk mengatur state dari checkbox
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,7 +42,7 @@ class LoginScreen extends StatelessWidget {
                 // Login Title
                 Text(
                   'Login',
-                  textAlign: TextAlign.left, // Rata kiri
+                  textAlign: TextAlign.left,
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w500,
@@ -47,7 +53,7 @@ class LoginScreen extends StatelessWidget {
                 // Subtitle
                 Text(
                   'Login to continue using the app',
-                  textAlign: TextAlign.left, // Rata kiri
+                  textAlign: TextAlign.left,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
@@ -96,9 +102,11 @@ class LoginScreen extends StatelessWidget {
                     Row(
                       children: [
                         Checkbox(
-                          value: false,
+                          value: _rememberMe,
                           onChanged: (value) {
-                            // Handle remember me
+                            setState(() {
+                              _rememberMe = value!;
+                            });
                           },
                         ),
                         Text('Remember me'),
@@ -108,14 +116,11 @@ class LoginScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
 
-                // Login Button
+                // Login Button tanpa navigasi
                 ElevatedButton(
                   onPressed: () {
-                    // Navigasi ke halaman Karyawan
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => KaryawanScreen()),
-                    );
+                    // Logika tambahan bisa ditambahkan di sini jika diperlukan
+                    print("Login button pressed");
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.yellow[700],
@@ -131,20 +136,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-
-                // Register Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("Don't have an account?"),
-                    TextButton(
-                      onPressed: () {
-                        // Handle register
-                      },
-                      child: Text('Register'),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),

@@ -1,6 +1,5 @@
-// main.dart
 import 'package:flutter/material.dart';
-import 'login.dart'; // Import login.dart
+import 'login.dart';
 
 void main() {
   runApp(MyApp());
@@ -23,7 +22,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // Image utama
             Container(
               padding: EdgeInsets.all(0),
               child: Image.asset(
@@ -95,24 +93,7 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
-                  SizedBox(height: 10),
-                  OutlinedButton(
-                    onPressed: () {
-                      // Action untuk tombol Register
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      minimumSize: Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      side: BorderSide(color: Colors.black),
-                    ),
-                    child: Text(
-                      'Register',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
+                  
                 ],
               ),
             ),
