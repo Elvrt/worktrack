@@ -25,24 +25,24 @@ class HomeScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(0),
               child: Image.asset(
-                'img/img1.png', // path img
+                'img/img1.png', 
                 height: 260,
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: 0.0), // Padding untuk logo
+                  horizontal: 0.0), 
               child: Align(
                 alignment: Alignment.topLeft,
                 child: Image.asset(
-                  'img/logo.png', // path img
+                  'img/logo.png', 
                   height: 100,
                 ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0), // Padding untuk teks
+                  horizontal: 20.0), // Padding teks
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -67,7 +67,7 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
-            // Login & Register button
+            // Login button
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: Column(
