@@ -63,8 +63,8 @@ flutter:
   assets:
     - img/clockin.png
     - img/camera.png
-    - img/img1.png
     - img/logo.png
+    - img/img1.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
