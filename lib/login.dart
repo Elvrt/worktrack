@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'faceRecog.dart'; // Import the face recognition screen
 
 void main() {
   runApp(MyApp());
@@ -19,7 +20,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _rememberMe = false; // Untuk mengatur state dari checkbox
+  bool _rememberMe = false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Logo
                 Image.asset(
-                  'img/logo.png', // Sesuaikan dengan path logo Anda
+                  'img/logo.png', 
                   height: 120,
                 ),
                 SizedBox(height: 10),
@@ -116,11 +117,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 20),
 
-                // Login Button tanpa navigasi
+                // Login Button with navigation
                 ElevatedButton(
                   onPressed: () {
-                    // Logika tambahan bisa ditambahkan di sini jika diperlukan
-                    print("Login button pressed");
+                    // Navigate to the face recognition screen
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            FaceVerificationScreen(), // Corrected class name
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.yellow[700],
