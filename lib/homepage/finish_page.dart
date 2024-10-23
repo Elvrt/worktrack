@@ -1,6 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:worktrack/navbar.dart';
 
+
+void main() {
+  runApp(FinishApp());
+}
+
+class FinishApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Clock In App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: finishpage(),
+    );
+  }
+}
 class finishpage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -9,6 +28,8 @@ class finishpage extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -73,13 +94,7 @@ class finishpage extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 InkWell(
-                  onTap: () {
-                    // Navigate to ClockOutPage
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => finishpage()),
-                    );
-                  },
+                  onTap: null,
                   child: CircleAvatar(
                     radius: 74,
                     backgroundColor: const Color.fromARGB(213, 210, 210, 210),
@@ -191,25 +206,7 @@ class finishpage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Mark active tab
-        selectedItemColor: Colors.yellow, // Color for the selected item
-        unselectedItemColor: Colors.grey, // Color for unselected items
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Report',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+           bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 

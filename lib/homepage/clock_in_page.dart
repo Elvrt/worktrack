@@ -1,6 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'home_page_after_clock_in.dart'; // Import halaman HomePageAfterClockIn
+import 'home_page_after_clock_in.dart';
+
+
+void main() {
+  runApp(ClockInApp());
+}
+
+class ClockInApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Clock In App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: ClockInPage(),
+    );
+  }
+}
 
 class ClockInPage extends StatelessWidget {
   @override
@@ -42,7 +61,13 @@ class ClockInPage extends StatelessWidget {
               Center(
                 child: Text(
                   'Clock In',
-                  style: TextStyle(color: Colors.black, fontSize: 24,letterSpacing: 4,fontFamily: 'inter',fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 24,
+                    letterSpacing: 4,
+                    fontFamily: 'inter',
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               SizedBox(height: 20),
@@ -78,7 +103,6 @@ class ClockInPage extends StatelessWidget {
               ),
               SizedBox(height: 30),
               Center(
-                // Wrap the button in a Center widget
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 239, 218, 26),
@@ -89,7 +113,6 @@ class ClockInPage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // Navigate to HomePageAfterClockIn
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -98,7 +121,8 @@ class ClockInPage extends StatelessWidget {
                   },
                   child: Text(
                     'Clock In',
-                    style: TextStyle(color: Colors.white, fontSize: 18,fontFamily: 'inter'),
+                    style: TextStyle(
+                        color: Colors.white, fontSize: 18, fontFamily: 'inter'),
                   ),
                 ),
               ),
