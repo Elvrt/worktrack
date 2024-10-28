@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'timeOffForm.dart'; // Import widget TimeOff
+import 'package:worktrack/timeOffPage/timeOffForm.dart'; // Import widget TimeOff
+import 'package:worktrack/homepage/home_screen.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -42,7 +43,10 @@ class _TimeOffScreenState extends State<timeOffInfo> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back), // Ikon panah kiri
               onPressed: () {
-                // Fungsi ketika tombol kembali ditekan
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
               },
             ),
           ),

@@ -1,8 +1,9 @@
 import 'dart:async'; // Import for Stream and Timer
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'clock_in_page.dart'; // Import ClockInPage
+import 'package:worktrack/homepage/clock_in_page.dart'; // Import ClockInPage
 import 'package:worktrack/navbar.dart';
+import 'package:worktrack/timeOffPage/timeOffForm.dart';
 
 void main() {
   runApp(HomeScreenPage());
@@ -154,10 +155,12 @@ class HomeScreen extends StatelessWidget {
                 Positioned(
                   bottom: 1,
                   right: 0,
-                  child: InkWell(
+                  child: GestureDetector(
                     onTap: () {
-                      // Implement Take Time Off function
-                      _showMessage(context, 'Take Time Off berhasil');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => timeOff()),
+                      );
                     },
                     child: CircleAvatar(
                       radius: 22,
