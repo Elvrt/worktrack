@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'finish_page.dart';
+import 'package:worktrack/homepage/finish_page.dart';
 
 
 void main() {

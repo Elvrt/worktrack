@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'clock_out_page.dart'; // Import halaman ClockOutPage
 import 'package:intl/intl.dart';
 import 'package:worktrack/navbar.dart';
-
+import 'package:worktrack/timeOffPage/timeOffForm.dart';
 
 void main() {
   runApp(HomeApp());
@@ -131,15 +131,17 @@ class HomePageAfterClockIn extends StatelessWidget {
                 Positioned(
                   bottom: 1,
                   right: 0,
-                  child: InkWell(
+                  child: GestureDetector(
                     onTap: () {
-                      // Implement Take Time Off function
-                      _showMessage(context, 'Take Time Off berhasil');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => timeOff()),
+                      );
                     },
                     child: CircleAvatar(
                       radius: 22,
                       backgroundColor: Colors.grey,
-                      child: Text(
+                      child: const Text(
                         'Take Time Off',
                         style: TextStyle(fontSize: 8, color: Colors.white),
                         textAlign: TextAlign.center,

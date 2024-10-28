@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'timeOffInfo.dart'; // Mengimpor file timeOffInfo.dart untuk navigasi
+import 'package:worktrack/timeOffPage/timeOffInfo.dart'; // Mengimpor file timeOffInfo.dart untuk navigasi
+import 'package:worktrack/homepage/home_screen.dart';
 
 void main() {
   runApp(const timeOff()); // Menjalankan aplikasi dengan widget timeOff
@@ -233,8 +234,8 @@ class BottomButton extends StatelessWidget {
           height: 45,
           child: TextButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Button pressed')), 
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => timeOffInfo()),
               );
             },
             style: TextButton.styleFrom(

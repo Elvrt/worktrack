@@ -40,7 +40,7 @@ class BottomNavBar extends StatelessWidget {
           case 1:
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) =>HomeScreen()), //belummm
+              MaterialPageRoute(builder: (context) =>HomeScreen()),
             );
             break;
           case 2:
