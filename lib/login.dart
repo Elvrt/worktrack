@@ -1,20 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart'; // Import the camera package
 import 'faceRecog.dart'; // Import the face recognition screen
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginScreen(),
-    );
-  }
-}
-
 class LoginScreen extends StatefulWidget {
+  final CameraDescription camera; // Add the camera parameter
+
+  LoginScreen({required this.camera}); // Modify constructor to accept the camera
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -35,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 // Logo
                 Image.asset(
-                  'img/logo.png', 
+                  'img/logo.png',
                   height: 120,
                 ),
                 SizedBox(height: 10),
@@ -120,12 +112,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Login Button with navigation
                 ElevatedButton(
                   onPressed: () {
-                    // Navigate to the face recognition screen
+                    // Navigate to the face recognition screen and pass the camera
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            FaceVerificationScreen(), // Corrected class name
+                        builder: (context) => FaceVerificationScreen(
+                          camera: widget.camera, // Pass the camera here
+                        ),
                       ),
                     );
                   },

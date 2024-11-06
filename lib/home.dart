@@ -1,20 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:camera/camera.dart';
 import 'login.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Fetch the available cameras
+  final cameras = await availableCameras();
+  final firstCamera = cameras.first;
+
+  runApp(MyApp(camera: firstCamera));
 }
 
 class MyApp extends StatelessWidget {
+  final CameraDescription camera;
+
+  MyApp({required this.camera});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(),
+      home: HomeScreen(camera: camera),
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
+  final CameraDescription camera;
+
+  HomeScreen({required this.camera});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,24 +40,22 @@ class HomeScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(0),
               child: Image.asset(
-                'img/img1.png', 
+                'img/img1.png',
                 height: 260,
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 0.0), 
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: Align(
                 alignment: Alignment.topLeft,
                 child: Image.asset(
-                  'img/logo.png', 
+                  'img/logo.png',
                   height: 100,
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0), // Padding teks
+              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Padding teks
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -75,9 +88,12 @@ class HomeScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       print("Login");
+                      // Pass the camera to the LoginScreen
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => LoginScreen(camera: camera),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -93,7 +109,6 @@ class HomeScreen extends StatelessWidget {
                       style: TextStyle(fontSize: 18),
                     ),
                   ),
-                  
                 ],
               ),
             ),
