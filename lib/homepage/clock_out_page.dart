@@ -1,7 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'finish_page.dart';
+import 'package:worktrack/homepage/finish_page.dart';
 
+
+void main() {
+  runApp(ClockOutApp());
+}
+
+class ClockOutApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Clock In App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: ClockOutPage(),
+    );
+  }
+}
 class ClockOutPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
