@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'timeOffInfo.dart'; // Mengimpor file timeOffInfo.dart untuk navigasi
-import 'package:file_picker/file_picker.dart';
+import 'package:worktrack/timeOffPage/timeOffInfo.dart'; // Mengimpor file timeOffInfo.dart untuk navigasi
+import 'package:worktrack/homepage/home_screen.dart';
+
 void main() {
   runApp(const timeOff()); // Menjalankan aplikasi dengan widget timeOff
 }
@@ -111,6 +112,7 @@ class TimeOffScreen extends StatelessWidget {
                   ),
                   const CustomTextField(label: '', isDateField: true), // Kolom input untuk tanggal
                   const SizedBox(height: 5),
+                  // Label untuk kolom 'Surat Izin Cuti (.pdf)'
                   Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.only(right: 100, bottom: 5.0),
@@ -122,7 +124,7 @@ class TimeOffScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const CustomTextField(label: '', isFileField: true), // Kolom input untuk surat izin
+                  const CustomTextField(label: ''), // Kolom input untuk surat izin
                   const SizedBox(height: 120),
                 ],
               ),
@@ -139,14 +141,8 @@ class TimeOffScreen extends StatelessWidget {
 class CustomTextField extends StatefulWidget {
   final String label;
   final bool isDateField;
-  final bool isFileField; // Tambahkan parameter untuk menentukan apakah ini adalah field file
 
-  const CustomTextField({
-    super.key, 
-    required this.label, 
-    this.isDateField = false, 
-    this.isFileField = false, // Inisialisasi isFileField sebagai false secara default
-  });
+  const CustomTextField({super.key, required this.label, this.isDateField = false});
 
   @override
   _CustomTextFieldState createState() => _CustomTextFieldState();
@@ -162,24 +158,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
       initialDate: DateTime.now(), // Tanggal awal adalah tanggal sekarang
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData(
+            colorScheme: ColorScheme.light(
+              primary: const Color.fromARGB(255, 253, 222, 41), // Warna tema untuk dialog
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!, // Mengembalikan child yang dibangun
+        );
+      },
     );
+    // Jika tanggal dipilih, set nilai kolom teks
     if (pickedDate != null) {
       setState(() {
-        _controller.text = "${pickedDate.toLocal()}".split(' ')[0]; // Format tanggal
-      });
-    }
-  }
-
-  // Fungsi untuk memilih file
-  Future<void> _selectFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['pdf'], // Hanya mengizinkan file PDF
-    );
-
-    if (result != null) {
-      setState(() {
-        _controller.text = result.files.single.name; // Menampilkan nama file yang dipilih
+        _controller.text = "${pickedDate.toLocal()}".split(' ')[0]; // Mengatur teks kolom
       });
     }
   }
@@ -196,7 +192,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           fontSize: 16,
           fontFamily: 'Inter',
         ),
-        readOnly: widget.isDateField || widget.isFileField, // Jika dateField atau fileField, kolom tidak bisa diedit
+        readOnly: false, // Biarkan kolom teks dapat diedit
         decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15), // Sudut border
@@ -215,16 +211,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     _selectDate(context); // Memanggil fungsi pemilih tanggal
                   },
                 )
-              : widget.isFileField
-                  ? IconButton(
-                      icon: const Icon(Icons.attach_file), // Ikon pemilih file
-                      onPressed: () {
-                        _selectFile(); // Memanggil fungsi pemilih file
-                      },
-                    )
-                  : null,
+              : null,
         ),
-        keyboardType: widget.isDateField ? TextInputType.datetime : TextInputType.text, // Tipe input
+        keyboardType: widget.isDateField ? TextInputType.datetime : TextInputType.text, // Tipe input untuk tanggal
       ),
     );
   }
@@ -245,8 +234,8 @@ class BottomButton extends StatelessWidget {
           height: 45,
           child: TextButton(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Button pressed')), 
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => timeOffInfo()),
               );
             },
             style: TextButton.styleFrom(

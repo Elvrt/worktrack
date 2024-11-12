@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "worktrack",
+        "request": "launch",
+        "type": "dart"
+      },
+      {
+        "name": "worktrack (profile mode)",
+        "request": "launch",
+        "type": "dart",
+        "flutterMode": "profile"
+      },
+      {
+        "name": "worktrack (release mode)",
+        "request": "launch",
+        "type": "dart",
+        "flutterMode": "release"
+      },
+      {
+        "name": "Flutter",
+        "request": "launch",
+        "type": "dart",
+        "program": "lib/home.dart",  // This specifies the entry point
+        "cwd": "${workspaceFolder}"
+      }
+    ]
+  }
+  

@@ -1,10 +1,28 @@
-import 'dart:async'; // Import for Stream and Timer
 import 'package:flutter/material.dart';
+import 'clock_out_page.dart'; // Import halaman ClockOutPage
 import 'package:intl/intl.dart';
-import 'clock_in_page.dart'; // Import ClockInPage
 import 'package:worktrack/navbar.dart';
+import 'package:worktrack/timeOffPage/timeOffForm.dart';
 
-class HomeScreen extends StatelessWidget {
+void main() {
+  runApp(HomeApp());
+}
+
+class HomeApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Clock In App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HomePageAfterClockIn(),
+    );
+  }
+}
+
+class HomePageAfterClockIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -12,6 +30,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -20,7 +39,6 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: kToolbarHeight), // Space for the AppBar height
-
             // Profile Info
             Row(
               children: [
@@ -30,16 +48,14 @@ class HomeScreen extends StatelessWidget {
                     'https://via.placeholder.com/150', // Replace with profile image URL
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
+                  children: [
                     Text(
                       'BONIFASIUS',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       '1231231',
@@ -49,8 +65,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-
+            SizedBox(height: 10),
             // Live Time
             StreamBuilder(
               stream: Stream.periodic(Duration(seconds: 1)),
@@ -58,12 +73,11 @@ class HomeScreen extends StatelessWidget {
                 String formattedTime = _formatTime(DateTime.now());
                 return Text(
                   formattedTime,
-                  style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 );
               },
             ),
-            const SizedBox(height: 5),
-
+            SizedBox(height: 5),
             // Live Date
             StreamBuilder(
               stream: Stream.periodic(Duration(seconds: 1)),
@@ -71,46 +85,26 @@ class HomeScreen extends StatelessWidget {
                 String formattedDate = _formatDate(DateTime.now());
                 return Text(
                   formattedDate,
-                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                  style: TextStyle(fontSize: 18, color: Colors.grey),
                 );
               },
             ),
-            const SizedBox(height: 15),
-
+            SizedBox(height: 15),
             // Clock In Button
             Stack(
               alignment: Alignment.center,
               children: [
                 InkWell(
                   onTap: () {
-                    // Navigate to ClockInPage
+                    // Navigate to ClockOutPage
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ClockInPage()),
+                      MaterialPageRoute(builder: (context) => ClockOutPage()),
                     );
                   },
-                  child: Container(
-                    width: 148, // Width of the button
-                    height: 148, // Height of the button
-                    decoration: BoxDecoration(
-                      gradient: RadialGradient(
-                        colors: [
-                          Color(0xFFFFD83A), // Custom yellow color for shade 300
-                          Color(0xFFFDF0A1), // Custom yellow color for shade 100
-                        ],
-                        center: Alignment(0.0, 0.0), // Center of the gradient
-                        radius: 1.0, // Radius of the gradient
-                      ),
-                      shape: BoxShape.circle, // Make it circular
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2), // Shadow color
-                          offset: Offset(4, 4), // Position of the shadow
-                          blurRadius: 8, // How much the shadow will be blurred
-                          spreadRadius: 1, // How much the shadow will spread
-                        ),
-                      ],
-                    ),
+                  child: CircleAvatar(
+                    radius: 74,
+                    backgroundColor: const Color.fromARGB(187, 255, 176, 18),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -119,9 +113,10 @@ class HomeScreen extends StatelessWidget {
                           width: 48, // Set the desired width of the image
                           height: 48, // Set the desired height of the image
                         ),
-                        const SizedBox(height: 8), // Add space between image and text
-                        const Text(
-                          'CLOCK IN',
+                        SizedBox(
+                            height: 13), // Add space between image and text
+                        Text(
+                          'CLOCK OUT',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 22,
@@ -136,10 +131,12 @@ class HomeScreen extends StatelessWidget {
                 Positioned(
                   bottom: 1,
                   right: 0,
-                  child: InkWell(
+                  child: GestureDetector(
                     onTap: () {
-                      // Implement Take Time Off function
-                      _showMessage(context, 'Take Time Off berhasil');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => timeOff()),
+                      );
                     },
                     child: CircleAvatar(
                       radius: 22,
@@ -155,35 +152,50 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 10),
-
+            SizedBox(height: 10),
             // Location Information
-            const Text(
+            Text(
               'Location: Unknown - Khalid',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            const SizedBox(height: 20),
-
+            SizedBox(height: 20),
             // Clock In / Debug iOS App / Clock Out
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildActionColumn(Icons.login, 'Clock In'),
-                _buildActionColumn(Icons.flag, 'Debug iOS App'),
-                _buildActionColumn(Icons.logout, 'Clock Out'),
+                Column(
+                  children: [
+                    Icon(Icons.login, size: 40, color: Colors.yellow),
+                    SizedBox(height: 5),
+                    Text('Clock In', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Icon(Icons.flag, size: 40, color: Colors.yellow),
+                    SizedBox(height: 5),
+                    Text('Debug iOS App', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Icon(Icons.logout, size: 40, color: Colors.yellow),
+                    SizedBox(height: 5),
+                    Text('Clock Out', style: TextStyle(fontSize: 16)),
+                  ],
+                ),
               ],
             ),
-            const SizedBox(height: 20),
-
+            SizedBox(height: 20),
             // Event Information
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.grey[200],
               ),
               child: Column(
-                children: const [
+                children: [
                   Text(
                     'Event',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -217,44 +229,18 @@ class HomeScreen extends StatelessWidget {
   }
 
   // Function to format time (hh:mm:ss)
-  static String _formatTime(DateTime dateTime) {
+  String _formatTime(DateTime dateTime) {
     return "${_twoDigits(dateTime.hour)} : ${_twoDigits(dateTime.minute)}";
   }
 
   // Function to format date (day, month date)
-  static String _formatDate(DateTime dateTime) {
+  String _formatDate(DateTime dateTime) {
     return DateFormat('EEEE, MMM d').format(dateTime);
   }
 
   // Helper to ensure two digits for hours and minutes
-  static String _twoDigits(int n) {
-    return n >= 10 ? "$n" : "0$n";
-  }
-
-  // Helper to build action columns
-  Column _buildActionColumn(IconData icon, String label) {
-    return Column(
-      children: [
-        ShaderMask(
-          shaderCallback: (Rect bounds) {
-            return RadialGradient(
-              colors: [
-                Color(0xFFFFD83A), // Custom yellow color for shade 300
-                Color(0xFFFDF0A1), // Custom yellow color for shade 100
-              ],
-              center: Alignment(0.0, 0.0), // Center of the gradient
-              radius: 1.0, // Radius of the gradient
-            ).createShader(bounds);
-          },
-          child: Icon(
-            icon,
-            size: 40,
-            color: Colors.white, // Color is set to white so the gradient is visible
-          ),
-        ),
-        const SizedBox(height: 5),
-        Text(label, style: const TextStyle(fontSize: 16)),
-      ],
-    );
+  String _twoDigits(int n) {
+    if (n >= 10) return "$n";
+    return "0$n";
   }
 }

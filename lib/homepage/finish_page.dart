@@ -1,8 +1,26 @@
 import 'package:flutter/material.dart';
-import 'clock_out_page.dart'; // Import halaman ClockOutPage
 import 'package:intl/intl.dart';
+import 'package:worktrack/navbar.dart';
+import 'package:worktrack/timeOffPage/timeOffForm.dart';
 
-class HomePageAfterClockIn extends StatelessWidget {
+void main() {
+  runApp(FinishApp());
+}
+
+class FinishApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Clock In App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: finishpage(),
+    );
+  }
+}
+class finishpage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,6 +28,8 @@ class HomePageAfterClockIn extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -74,16 +94,10 @@ class HomePageAfterClockIn extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 InkWell(
-                  onTap: () {
-                    // Navigate to ClockOutPage
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ClockOutPage()),
-                    );
-                  },
+                  onTap: null,
                   child: CircleAvatar(
                     radius: 74,
-                    backgroundColor: const Color.fromARGB(187, 255, 176, 18),
+                    backgroundColor: const Color.fromARGB(213, 210, 210, 210),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -95,7 +109,7 @@ class HomePageAfterClockIn extends StatelessWidget {
                         SizedBox(
                             height: 13), // Add space between image and text
                         Text(
-                          'CLOCK OUT',
+                          'CLOCK IN',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 22,
@@ -110,15 +124,17 @@ class HomePageAfterClockIn extends StatelessWidget {
                 Positioned(
                   bottom: 1,
                   right: 0,
-                  child: InkWell(
+                  child: GestureDetector(
                     onTap: () {
-                      // Implement Take Time Off function
-                      _showMessage(context, 'Take Time Off berhasil');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => timeOff()),
+                      );
                     },
                     child: CircleAvatar(
                       radius: 22,
                       backgroundColor: Colors.grey,
-                      child: Text(
+                      child: const Text(
                         'Take Time Off',
                         style: TextStyle(fontSize: 8, color: Colors.white),
                         textAlign: TextAlign.center,
@@ -192,25 +208,7 @@ class HomePageAfterClockIn extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Mark active tab
-        selectedItemColor: Colors.yellow, // Color for the selected item
-        unselectedItemColor: Colors.grey, // Color for unselected items
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Report',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+           bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 

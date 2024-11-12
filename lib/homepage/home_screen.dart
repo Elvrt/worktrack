@@ -1,7 +1,29 @@
+import 'dart:async'; // Import for Stream and Timer
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:worktrack/homepage/clock_in_page.dart'; // Import ClockInPage
+import 'package:worktrack/navbar.dart';
+import 'package:worktrack/timeOffPage/timeOffForm.dart';
 
-class finishpage extends StatelessWidget {
+void main() {
+  runApp(HomeScreenPage());
+}
+
+class HomeScreenPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Clock In App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HomeScreen(),
+    );
+  }
+}
+
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,6 +39,7 @@ class finishpage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: kToolbarHeight), // Space for the AppBar height
+
             // Profile Info
             Row(
               children: [
@@ -26,14 +49,16 @@ class finishpage extends StatelessWidget {
                     'https://via.placeholder.com/150', // Replace with profile image URL
                   ),
                 ),
-                SizedBox(width: 10),
+                const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  children: const [
                     Text(
                       'BONIFASIUS',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       '1231231',
@@ -43,7 +68,8 @@ class finishpage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+
             // Live Time
             StreamBuilder(
               stream: Stream.periodic(Duration(seconds: 1)),
@@ -51,11 +77,12 @@ class finishpage extends StatelessWidget {
                 String formattedTime = _formatTime(DateTime.now());
                 return Text(
                   formattedTime,
-                  style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
                 );
               },
             ),
-            SizedBox(height: 5),
+            const SizedBox(height: 5),
+
             // Live Date
             StreamBuilder(
               stream: Stream.periodic(Duration(seconds: 1)),
@@ -63,26 +90,46 @@ class finishpage extends StatelessWidget {
                 String formattedDate = _formatDate(DateTime.now());
                 return Text(
                   formattedDate,
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
                 );
               },
             ),
-            SizedBox(height: 15),
+            const SizedBox(height: 15),
+
             // Clock In Button
             Stack(
               alignment: Alignment.center,
               children: [
                 InkWell(
                   onTap: () {
-                    // Navigate to ClockOutPage
+                    // Navigate to ClockInPage
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => finishpage()),
+                      MaterialPageRoute(builder: (context) => ClockInPage()),
                     );
                   },
-                  child: CircleAvatar(
-                    radius: 74,
-                    backgroundColor: const Color.fromARGB(213, 210, 210, 210),
+                  child: Container(
+                    width: 148, // Width of the button
+                    height: 148, // Height of the button
+                    decoration: BoxDecoration(
+                      gradient: RadialGradient(
+                        colors: [
+                          Color(0xFFFFD83A), // Custom yellow color for shade 300
+                          Color(0xFFFDF0A1), // Custom yellow color for shade 100
+                        ],
+                        center: Alignment(0.0, 0.0), // Center of the gradient
+                        radius: 1.0, // Radius of the gradient
+                      ),
+                      shape: BoxShape.circle, // Make it circular
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2), // Shadow color
+                          offset: Offset(4, 4), // Position of the shadow
+                          blurRadius: 8, // How much the shadow will be blurred
+                          spreadRadius: 1, // How much the shadow will spread
+                        ),
+                      ],
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -91,9 +138,8 @@ class finishpage extends StatelessWidget {
                           width: 48, // Set the desired width of the image
                           height: 48, // Set the desired height of the image
                         ),
-                        SizedBox(
-                            height: 13), // Add space between image and text
-                        Text(
+                        const SizedBox(height: 8), // Add space between image and text
+                        const Text(
                           'CLOCK IN',
                           style: TextStyle(
                             color: Colors.black,
@@ -109,15 +155,17 @@ class finishpage extends StatelessWidget {
                 Positioned(
                   bottom: 1,
                   right: 0,
-                  child: InkWell(
+                  child: GestureDetector(
                     onTap: () {
-                      // Implement Take Time Off function
-                      _showMessage(context, 'Take Time Off berhasil');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => timeOff()),
+                      );
                     },
                     child: CircleAvatar(
                       radius: 22,
                       backgroundColor: Colors.grey,
-                      child: Text(
+                      child: const Text(
                         'Take Time Off',
                         style: TextStyle(fontSize: 8, color: Colors.white),
                         textAlign: TextAlign.center,
@@ -128,50 +176,35 @@ class finishpage extends StatelessWidget {
               ],
             ),
 
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
+
             // Location Information
-            Text(
+            const Text(
               'Location: Unknown - Khalid',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+
             // Clock In / Debug iOS App / Clock Out
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  children: [
-                    Icon(Icons.login, size: 40, color: Colors.yellow),
-                    SizedBox(height: 5),
-                    Text('Clock In', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Icon(Icons.flag, size: 40, color: Colors.yellow),
-                    SizedBox(height: 5),
-                    Text('Debug iOS App', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Icon(Icons.logout, size: 40, color: Colors.yellow),
-                    SizedBox(height: 5),
-                    Text('Clock Out', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
+                _buildActionColumn(Icons.login, 'Clock In'),
+                _buildActionColumn(Icons.flag, 'Debug iOS App'),
+                _buildActionColumn(Icons.logout, 'Clock Out'),
               ],
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+
             // Event Information
             Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.grey[200],
               ),
               child: Column(
-                children: [
+                children: const [
                   Text(
                     'Event',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -191,25 +224,7 @@ class finishpage extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Mark active tab
-        selectedItemColor: Colors.yellow, // Color for the selected item
-        unselectedItemColor: Colors.grey, // Color for unselected items
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Report',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 
@@ -223,18 +238,44 @@ class finishpage extends StatelessWidget {
   }
 
   // Function to format time (hh:mm:ss)
-  String _formatTime(DateTime dateTime) {
+  static String _formatTime(DateTime dateTime) {
     return "${_twoDigits(dateTime.hour)} : ${_twoDigits(dateTime.minute)}";
   }
 
   // Function to format date (day, month date)
-  String _formatDate(DateTime dateTime) {
+  static String _formatDate(DateTime dateTime) {
     return DateFormat('EEEE, MMM d').format(dateTime);
   }
 
   // Helper to ensure two digits for hours and minutes
-  String _twoDigits(int n) {
-    if (n >= 10) return "$n";
-    return "0$n";
+  static String _twoDigits(int n) {
+    return n >= 10 ? "$n" : "0$n";
+  }
+
+  // Helper to build action columns
+  Column _buildActionColumn(IconData icon, String label) {
+    return Column(
+      children: [
+        ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return RadialGradient(
+              colors: [
+                Color(0xFFFFD83A), // Custom yellow color for shade 300
+                Color(0xFFFDF0A1), // Custom yellow color for shade 100
+              ],
+              center: Alignment(0.0, 0.0), // Center of the gradient
+              radius: 1.0, // Radius of the gradient
+            ).createShader(bounds);
+          },
+          child: Icon(
+            icon,
+            size: 40,
+            color: Colors.white, // Color is set to white so the gradient is visible
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(label, style: const TextStyle(fontSize: 16)),
+      ],
+    );
   }
 }
