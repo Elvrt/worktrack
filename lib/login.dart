@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:camera/camera.dart'; // Import the camera package
-import 'faceRecog.dart'; // Import the face recognition screen
+import 'package:worktrack/homepage/home_screen.dart'; // Pastikan HomeScreenPage diimport
+
+String urlDomain = "http://192.168.0.134:8000/";
+String urlLogin = "${urlDomain}api/login";
+
+// Global variable for the token
+String? authToken;
 
 class LoginScreen extends StatefulWidget {
   final CameraDescription camera; // Add the camera parameter
@@ -12,7 +19,55 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  String? errorMessage;
+
   bool _rememberMe = false;
+
+  Future<void> login() async {
+    try {
+      final dio = Dio();
+      final response = await dio.post(
+        urlLogin,
+        data: {
+          'username': usernameController.text,
+          'password': passwordController.text,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        authToken = data['access_token']; // Store token in global variable
+
+        // Navigate to the HomeScreenPage after successful login
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreenPage(), // Arahkan ke HomeScreenPage
+          ),
+        );
+      } else {
+        setState(() {
+          errorMessage = "Login failed: Incorrect credentials.";
+        });
+      }
+    } on DioError catch (e) {
+      setState(() {
+        if (e.type == DioErrorType.connectionTimeout ||
+            e.type == DioErrorType.sendTimeout ||
+            e.type == DioErrorType.receiveTimeout) {
+          errorMessage = "Connection timeout. Please try again.";
+        } else if (e.type == DioErrorType.connectionError) {
+          errorMessage = "Could not connect to server. Check your network.";
+        } else if (e.response != null && e.response?.statusCode == 401) {
+          errorMessage = "Unauthorized: Incorrect username or password.";
+        } else {
+          errorMessage = "An unexpected error occurred.";
+        }
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Username TextField
                 TextField(
+                  controller: usernameController,
                   decoration: InputDecoration(
                     labelText: 'Username',
                     border: OutlineInputBorder(
@@ -67,6 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // Password TextField
                 TextField(
+                  controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: 'Password',
@@ -76,6 +133,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 10),
+
+                // Error Message
+                if (errorMessage != null)
+                  Text(
+                    errorMessage!,
+                    style: TextStyle(color: Colors.red),
+                  ),
 
                 // Forgot Password & Remember me Row
                 Row(
@@ -109,19 +173,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 20),
 
-                // Login Button with navigation
+                // Login Button
                 ElevatedButton(
-                  onPressed: () {
-                    // Navigate to the face recognition screen and pass the camera
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FaceVerificationScreen(
-                          camera: widget.camera, // Pass the camera here
-                        ),
-                      ),
-                    );
-                  },
+                  onPressed: login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.yellow[700],
                     foregroundColor: Colors.white,
