@@ -1,35 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 import 'login.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Fetch the available cameras
-  final cameras = await availableCameras();
-  final firstCamera = cameras.first;
-
-  runApp(MyApp(camera: firstCamera));
+void main() {
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final CameraDescription camera;
-
-  MyApp({required this.camera});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(camera: camera),
+      home: HomeScreen(),
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
-  final CameraDescription camera;
-
-  HomeScreen({required this.camera});
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,11 +73,11 @@ class HomeScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       print("Login");
-                      // Pass the camera to the LoginScreen
+                      // Navigate to the LoginScreen
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => LoginScreen(camera: camera),
+                          builder: (context) => LoginScreen(),
                         ),
                       );
                     },
