@@ -158,14 +158,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.23"
-  flutter_plugin_android_lifecycle:
-    dependency: transitive
-    description:
-      name: flutter_plugin_android_lifecycle
-      sha256: "9b78450b89f059e96c9ebb355fa6b3df1d6b330436e0b885fb49594c41721398"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.23"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -192,11 +184,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  flutter_web_plugins:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
   intl:
     dependency: "direct main"
     description:
@@ -281,10 +268,10 @@ packages:
     dependency: transitive
     description:
       name: path_parsing
-      sha256: e3e67b1629e6f7e8100b367d3db6ba6af4b1f0bb80f64db18ef1fbabd2fa9ccf
+      sha256: "883402936929eac138ee0a45da5b0f2c80f89913e6dc3bf77eb65b84b409c6ca"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.1.0"
   petitparser:
     dependency: transitive
     description:
@@ -309,14 +296,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.2"
-  plugin_platform_interface:
-    dependency: transitive
-    description:
-      name: plugin_platform_interface
-      sha256: "4820fbfdb9478b1ebae27888254d445073732dae3d6ea81f0b7e06d5dedc3f02"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.8"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -402,14 +381,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "14.2.5"
+  web:
+    dependency: transitive
+    description:
+      name: web
+      sha256: cd3543bd5798f6ad290ea73d210f423502e71900302dde696f8bff84bf89a1cb
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   win32:
     dependency: transitive
     description:
       name: win32
-      sha256: e5c39a90447e7c81cfec14b041cdbd0d0916bd9ebbc7fe02ab69568be703b9bd
+      sha256: "84ba388638ed7a8cb3445a320c8273136ab2631cd5f2c57888335504ddab1bc2"
       url: "https://pub.dev"
     source: hosted
-    version: "5.6.0"
+    version: "5.8.0"
   xml:
     dependency: transitive
     description:
@@ -420,5 +407,4 @@ packages:
     version: "6.5.0"
 sdks:
   dart: ">=3.5.2 <4.0.0"
-  flutter: ">=3.24.0"
   flutter: ">=3.24.0"
