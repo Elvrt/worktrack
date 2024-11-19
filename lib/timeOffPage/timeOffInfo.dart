@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'timeOffForm.dart';
 import 'package:worktrack/homepage/home_screen.dart';
-
+import 'package:worktrack/login.dart'; // Untuk akses authToken
 
 void main() {
   runApp(MaterialApp(
@@ -20,7 +20,7 @@ class timeOffInfo extends StatefulWidget {
 
 class _TimeOffScreenState extends State<timeOffInfo> {
   List<Map<String, String>> requests = [];
-  final String apiUrl = "http://localhost:8000/api/timeoff/";
+  final String apiUrl = "${urlDomain}api/timeoff/";
   final Dio _dio = Dio();
   int currentPage = 1;
   bool isLastPage = false;
@@ -33,14 +33,23 @@ class _TimeOffScreenState extends State<timeOffInfo> {
 
   Future<void> fetchRequests(int page) async {
     try {
+      // Tambahkan token ke header
+      final options = Options(
+        headers: {
+          'Authorization': 'Bearer $authToken', // Gunakan token dari login.dart
+        },
+      );
+
       // Memuat data dari API dengan parameter halaman dan limit
-      Response response = await _dio.get(apiUrl, queryParameters: {
-        'page': page,
-        'limit': 5,
-      });
+      Response response = await _dio.get(
+        apiUrl,
+        queryParameters: {'page': page, 'limit': 5},
+        options: options,
+      );
 
       // Cek format data apakah sesuai dengan yang diharapkan
-      var decodedData = response.data is String ? jsonDecode(response.data) : response.data;
+      var decodedData =
+          response.data is String ? jsonDecode(response.data) : response.data;
       print("Fetching page: $page");
       print("Response data: $decodedData");
 
@@ -49,14 +58,17 @@ class _TimeOffScreenState extends State<timeOffInfo> {
 
         setState(() {
           // Tampilkan hanya data dari halaman saat ini
-          requests = data.map((item) => {
-            'dateRequest': item['time_off_id'].toString(),
-            'workLeave': '${item['start_date']} - ${item['end_date']}',
-            'status': item['status'].toString(),
-          }).toList();
+          requests = data
+              .map((item) => {
+                    'dateRequest': item['time_off_id'].toString(),
+                    'workLeave': '${item['start_date']} - ${item['end_date']}',
+                    'status': item['status'].toString(),
+                  })
+              .toList();
 
           // Perbarui kondisi isLastPage berdasarkan jumlah item di halaman
-          isLastPage = data.length < 5; // Jika data kurang dari limit, artinya halaman terakhir
+          isLastPage = data.length <
+              5; // Jika data kurang dari limit, artinya halaman terakhir
           print("Is last page: $isLastPage");
         });
       } else {
@@ -67,14 +79,13 @@ class _TimeOffScreenState extends State<timeOffInfo> {
     }
   }
 
-
   void _navigateToTimeOff() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => const timeOff()),
     );
   }
 
-   void _loadNextPage() {
+  void _loadNextPage() {
     if (!isLastPage) {
       setState(() {
         currentPage++;
@@ -103,7 +114,10 @@ class _TimeOffScreenState extends State<timeOffInfo> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreenPage()),
+                );
               },
             ),
           ),
