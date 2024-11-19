@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:worktrack/timeOffPage/timeOffInfo.dart'; // Mengimpor file timeOffInfo.dart untuk navigasi
-import 'package:worktrack/homepage/home_screen.dart';
+import 'timeOffInfo.dart'; // Mengimpor file timeOffInfo.dart untuk navigasi
+import 'package:file_picker/file_picker.dart';
+import 'package:dio/dio.dart'; // Mengimpor Dio untuk HTTP request
+import 'dart:io';
 
 void main() {
   runApp(const timeOff()); // Menjalankan aplikasi dengan widget timeOff
@@ -18,9 +20,51 @@ class timeOff extends StatelessWidget {
   }
 }
 
+  // Fungsi untuk mengirim data ke API
+  Future<void> _submitData(BuildContext context) async {
+    try {
+      Dio dio = Dio();
+      String reason = "Alasan cuti"; // Ambil data alasan cuti dari field
+      String startDate = "2024-11-11"; // Ambil data tanggal mulai dari field
+      String endDate = "2024-11-12"; // Ambil data tanggal selesai dari field
+      String fileName = ""; // Path file
+      if (fileName.isNotEmpty) {
+        File file = File(fileName);
+        MultipartFile fileToSend = await MultipartFile.fromFile(file.path, filename: fileName);
+        FormData formData = FormData.fromMap({
+          'reason': reason,
+          'start_date': startDate,
+          'end_date': endDate,
+          'letter': fileToSend,
+        });
+
+        var response = await dio.post(
+          'http://10.0.2.2:8000/api/timeoff/', 
+          data: formData,
+        );
+
+        if (response.statusCode == 200) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Data successfully submitted')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to submit data')),
+          );
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+
 // Layar untuk mengisi formulir waktu cuti
 class TimeOffScreen extends StatelessWidget {
   const TimeOffScreen({super.key});
+  
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +127,7 @@ class TimeOffScreen extends StatelessWidget {
                       letterSpacing: 4,
                     ),
                   ),
-                  const SizedBox(height: 60),
+                  const SizedBox(height: 20),
                   // Label untuk kolom 'Alasan'
                   Container(
                     alignment: Alignment.center,
@@ -96,26 +140,38 @@ class TimeOffScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const CustomTextField(label: ''), // Kolom input untuk alasan
+                  const CustomTextField(label: '', isDateField: false), // Kolom input untuk alasan
                   const SizedBox(height: 5),
                   // Label untuk kolom 'Tanggal Cuti'
                   Container(
                     alignment: Alignment.center,
-                    padding: const EdgeInsets.only(right: 170, bottom: 5.0),
+                    padding: const EdgeInsets.only(right: 240, bottom: 5.0),
                     child: const Text(
-                      'Date of Work Leave',
+                      'Start Date',
                       style: TextStyle(
                         fontSize: 16,
                         fontFamily: 'Inter',
                       ),
                     ),
                   ),
-                  const CustomTextField(label: '', isDateField: true), // Kolom input untuk tanggal
+                  const CustomTextField(label: '', isDateField: true), // Kolom input untuk tanggal mulai
                   const SizedBox(height: 5),
-                  // Label untuk kolom 'Surat Izin Cuti (.pdf)'
                   Container(
                     alignment: Alignment.center,
-                    padding: const EdgeInsets.only(right: 100, bottom: 5.0),
+                    padding: const EdgeInsets.only(right: 250, bottom: 5.0),
+                    child: const Text(
+                      'End Date',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'Inter',
+                      ),
+                    ),
+                  ),
+                  const CustomTextField(label: '', isDateField: true), // Kolom input untuk tanggal selesai
+                  const SizedBox(height: 5),
+                  Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.only(right: 90, bottom: 5.0),
                     child: const Text(
                       'Leave Permission Letter (.pdf)',
                       style: TextStyle(
@@ -124,13 +180,15 @@ class TimeOffScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const CustomTextField(label: ''), // Kolom input untuk surat izin
-                  const SizedBox(height: 120),
+                  const CustomTextField(label: '', isFileField: true), // Kolom input untuk surat izin
+                  const SizedBox(height: 50),
                 ],
               ),
             ),
           ),
-          const BottomButton(), // Menampilkan tombol di bagian bawah
+          BottomButton(
+            onPressed: () => _submitData(context), // Memanggil fungsi _submitData saat tombol ditekan
+          ),
         ],
       ),
     );
@@ -141,8 +199,14 @@ class TimeOffScreen extends StatelessWidget {
 class CustomTextField extends StatefulWidget {
   final String label;
   final bool isDateField;
+  final bool isFileField; // Tambahkan parameter untuk menentukan apakah ini adalah field file
 
-  const CustomTextField({super.key, required this.label, this.isDateField = false});
+  const CustomTextField({
+    super.key, 
+    required this.label, 
+    this.isDateField = false, 
+    this.isFileField = false, // Inisialisasi isFileField sebagai false secara default
+  });
 
   @override
   _CustomTextFieldState createState() => _CustomTextFieldState();
@@ -158,24 +222,24 @@ class _CustomTextFieldState extends State<CustomTextField> {
       initialDate: DateTime.now(), // Tanggal awal adalah tanggal sekarang
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData(
-            colorScheme: ColorScheme.light(
-              primary: const Color.fromARGB(255, 253, 222, 41), // Warna tema untuk dialog
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-            dialogBackgroundColor: Colors.white,
-          ),
-          child: child!, // Mengembalikan child yang dibangun
-        );
-      },
     );
-    // Jika tanggal dipilih, set nilai kolom teks
     if (pickedDate != null) {
       setState(() {
-        _controller.text = "${pickedDate.toLocal()}".split(' ')[0]; // Mengatur teks kolom
+        _controller.text = "${pickedDate.toLocal()}".split(' ')[0]; // Format tanggal
+      });
+    }
+  }
+
+  // Fungsi untuk memilih file
+  Future<void> _selectFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf'], // Hanya mengizinkan file PDF
+    );
+
+    if (result != null) {
+      setState(() {
+        _controller.text = result.files.single.name; // Menampilkan nama file yang dipilih
       });
     }
   }
@@ -192,7 +256,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           fontSize: 16,
           fontFamily: 'Inter',
         ),
-        readOnly: false, // Biarkan kolom teks dapat diedit
+        readOnly: widget.isFileField, // Jika dateField atau fileField, kolom tidak bisa diedit
         decoration: InputDecoration(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15), // Sudut border
@@ -211,9 +275,16 @@ class _CustomTextFieldState extends State<CustomTextField> {
                     _selectDate(context); // Memanggil fungsi pemilih tanggal
                   },
                 )
-              : null,
+              : widget.isFileField
+                  ? IconButton(
+                      icon: const Icon(Icons.attach_file), // Ikon pemilih file
+                      onPressed: () {
+                        _selectFile(); // Memanggil fungsi pemilih file
+                      },
+                    )
+                  : null,
         ),
-        keyboardType: widget.isDateField ? TextInputType.datetime : TextInputType.text, // Tipe input untuk tanggal
+        keyboardType: widget.isDateField ? TextInputType.datetime : TextInputType.text,
       ),
     );
   }
@@ -221,7 +292,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
 // Widget untuk tombol di bagian bawah
 class BottomButton extends StatelessWidget {
-  const BottomButton({super.key});
+  final VoidCallback onPressed;
+
+  const BottomButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -234,9 +307,8 @@ class BottomButton extends StatelessWidget {
           height: 45,
           child: TextButton(
             onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (context) => timeOffInfo()),
-              );
+              // Mengirim data ke API lokal 
+              _submitData(context);
             },
             style: TextButton.styleFrom(
               backgroundColor: const Color.fromARGB(255, 246, 214, 71), // Warna latar belakang tombol
@@ -249,7 +321,6 @@ class BottomButton extends StatelessWidget {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,
-                fontWeight: FontWeight.bold,
                 fontFamily: 'Inter',
               ),
             ),
