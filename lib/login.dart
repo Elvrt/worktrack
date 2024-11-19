@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:worktrack/homepage/home_screen.dart'; // Pastikan HomeScreenPage diimport
 
-String urlDomain = "http://192.168.62.12:8000/";
+// URL konfigurasi
+String urlDomain = "http://192.168.77.166:8000/";
 String urlLogin = "${urlDomain}api/login";
 
 // Global variable for the token
 String? authToken;
 
 class LoginScreen extends StatefulWidget {
-  // Remove camera parameter
   LoginScreen({Key? key}) : super(key: key);
 
   @override
@@ -36,13 +36,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (response.statusCode == 200) {
         final data = response.data;
-        authToken = data['access_token']; // Store token in global variable
+        authToken = data['access_token']; // Simpan token ke global variable
 
-        // Navigate to the HomeScreenPage after successful login
+        // Navigasi ke HomeScreenPage setelah login berhasil
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => HomeScreenPage(), // Arahkan ke HomeScreenPage
+            builder: (context) => HomeScreenPage(),
           ),
         );
       } else {
