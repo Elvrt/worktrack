@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:worktrack/homepage/home_screen.dart'; // Pastikan HomeScreenPage diimport
 
 // URL konfigurasi
-String urlDomain = "http://192.168.77.166:8000/";
+String urlDomain = "http://192.168.77.169:8000/";
 String urlLogin = "${urlDomain}api/login";
 
 // Global variable for the token
