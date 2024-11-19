@@ -46,7 +46,7 @@ class ReportDetail extends StatelessWidget {
             Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => reportmonthly()));
+                              builder: (context) => ReportPage()));
           },
         ),
         actions: [

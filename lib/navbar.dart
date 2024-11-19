@@ -34,7 +34,7 @@ class BottomNavBar extends StatelessWidget {
           case 0:
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => reportmonthly()),
+              MaterialPageRoute(builder: (context) => ReportPage()),
             );
             break;
           case 1:

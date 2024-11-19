@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:worktrack/Report/reportdetail.dart';
-import 'package:worktrack/navbar.dart';
+import 'package:dio/dio.dart';
 
 void main() {
-  runApp(const reportmonthly());
+  runApp(const ReportMonthlyApp());
 }
 
-class reportmonthly extends StatelessWidget {
-  const reportmonthly({super.key});
+class ReportMonthlyApp extends StatelessWidget {
+  const ReportMonthlyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +19,41 @@ class reportmonthly extends StatelessWidget {
   }
 }
 
-class ReportPage extends StatelessWidget {
+class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
+
+  @override
+  State<ReportPage> createState() => _ReportPageState();
+}
+
+class _ReportPageState extends State<ReportPage> {
+  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://localhost:8000/api/showreport'));
+  List<dynamic> _reports = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchReports('2024-11'); // Default filter for November 2024
+  }
+
+  Future<void> _fetchReports(String month) async {
+    setState(() {
+      _isLoading = true;
+    });
+    try {
+      final response = await _dio.get('/reports', queryParameters: {'month': month});
+      setState(() {
+        _reports = response.data['data'];
+        _isLoading = false;
+      });
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      print('Error fetching reports: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,43 +63,14 @@ class ReportPage extends StatelessWidget {
         title: const Text(
           'REPORT',
           style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w500,
-              fontFamily: 'Urbanist'),
+            fontSize: 30,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Urbanist',
+          ),
         ),
         centerTitle: true,
         toolbarHeight: 100,
         backgroundColor: Colors.white,
-        actions: [
-          Padding(
-            padding:
-                const EdgeInsets.only(right: 16.0), // Adjust padding as needed
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment:
-                  CrossAxisAlignment.end, // Align text to the right
-              children: const [
-                Text(
-                  '17:19',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black, // Adjust color for visibility
-                  ),
-                ),
-                Text(
-                  'Wednesday, 11 Feb',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                    color: Colors.black, // Adjust color for visibility
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -75,140 +78,90 @@ class ReportPage extends StatelessWidget {
             width: double.infinity,
             height: 51,
             decoration: BoxDecoration(
-              color: Color(0x56FFD83A),
+              color: const Color(0x56FFD83A),
               border: Border.all(
                 color: Colors.black.withOpacity(0.1),
                 width: 1,
               ),
             ),
             alignment: Alignment.center,
-            child: Container(
-              width: double.infinity,
-              height: 51,
-              decoration: BoxDecoration(
-                color: Color(0xFFF2BC),
-                border: Border.all(
-                  color: Colors.black.withOpacity(0.1),
-                  width: 1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back_ios_new),
+                  color: Colors.black,
+                  onPressed: () {
+                    // Fetch data for the previous month
+                    _fetchReports('2024-10'); // Example for October
+                  },
                 ),
-              ),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios_new),
+                const Text(
+                  'November 2024',
+                  style: TextStyle(
                     color: Colors.black,
-                    onPressed: () {
-                      // Add your back action here
-                    },
+                    fontFamily: 'Inter',
+                    fontSize: 24,
+                    fontWeight: FontWeight.w400,
                   ),
-                  Text(
-                    'February 2024',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontFamily: 'Inter',
-                      fontSize: 24,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.arrow_forward_ios),
-                    color: Colors.black,
-                    onPressed: () {
-                      // Add your next action here
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Container(
-            color: Color(0x56FFD83A), // Background color for the row
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                Text('Date',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    )),
-                Text('Clock In',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    )),
-                Text('Clock Out',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    )),
-                Text('Activity',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'Inter',
-                    )),
+                  textAlign: TextAlign.center,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward_ios),
+                  color: Colors.black,
+                  onPressed: () {
+                    // Fetch data for the next month
+                    _fetchReports('2024-12'); // Example for December
+                  },
+                ),
               ],
             ),
           ),
-
-          const SizedBox(height: 30),
-          // Add more content here for rows, etc.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ReportDetail()),
-                );
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  Text('11', style: TextStyle(fontSize: 16)),
-                  Text(
-                    '08:59',
-                    style: TextStyle(
-                      color: Color(0xFF09740E),
-                      fontSize: 16,
+          const SizedBox(height: 10),
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _reports.isEmpty
+                  ? const Center(child: Text('No reports found'))
+                  : Expanded(
+                      child: ListView.builder(
+                        itemCount: _reports.length,
+                        itemBuilder: (context, index) {
+                          final report = _reports[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  report['absence_date'] ?? '-',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                Text(
+                                  report['clock_in'] ?? '-',
+                                  style: const TextStyle(
+                                    color: Color(0xFF09740E),
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text(
+                                  report['clock_out'] ?? '-',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                                Text(
+                                  report['activity_title'] ?? '-',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                  Text('17:02', style: TextStyle(fontSize: 16)),
-                  Text('Update Data', style: TextStyle(fontSize: 16)),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 30),
-
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: const [
-                Text('10', style: TextStyle(fontSize: 16)),
-                Text('09:21',
-                    style: TextStyle(
-                      color: Color(0xFF9A1212),
-                      fontSize: 16,
-                    )),
-                Text('17:02', style: TextStyle(fontSize: 16)),
-                Text('Update Data', style: TextStyle(fontSize: 16)),
-              ],
-            ),
-          ),
         ],
       ),
-      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
   }
 }
