@@ -57,7 +57,7 @@ class ClockInPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
+              SizedBox(height: 17),
               Center(
                 child: Text(
                   'Clock In',

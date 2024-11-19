@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:worktrack/homepage/home_screen.dart'; // Pastikan HomeScreenPage diimport
 
-String urlDomain = "http://192.168.62.12:8000/";
+String urlDomain = "http://192.168.77.180:8000/";
 String urlLogin = "${urlDomain}api/login";
 
 // Global variable for the token
