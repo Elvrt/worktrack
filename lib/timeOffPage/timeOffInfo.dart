@@ -4,6 +4,8 @@ import 'package:dio/dio.dart';
 import 'timeOffForm.dart';
 import 'package:worktrack/homepage/home_screen.dart';
 import 'package:worktrack/login.dart'; // Untuk akses authToken
+import 'timeOffDetail.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -58,11 +60,15 @@ class _TimeOffScreenState extends State<timeOffInfo> {
 
         setState(() {
           // Tampilkan hanya data dari halaman saat ini
-          requests = data
-              .map((item) => {
-                    'dateRequest': item['time_off_id'].toString(),
+          requests = data.map((item) => {
+                    'no_request': item['time_off_id'].toString(),
                     'workLeave': '${item['start_date']} - ${item['end_date']}',
                     'status': item['status'].toString(),
+                    'employee_id' : item ['employee_id'].toString(),
+                    'employee_name': item['employee']['name'].toString(), // Ambil nama karyawan
+                    'reason' : item['reason'].toString(),
+                    'letter' : item['letter'].toString()
+                    
                   })
               .toList();
 
@@ -77,6 +83,56 @@ class _TimeOffScreenState extends State<timeOffInfo> {
     } catch (e) {
       print('Error fetching requests: $e');
     }
+  }
+
+    // Format waktu
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
+  }
+
+  // Format tanggal
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
+  }
+
+ // model tanggal dan waktu
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatTime(now),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              _formatDate(now),
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  void _navigateToTimeOffDetail(Map<String, String> request) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TimeOffDetail( timeOffRequest: request),
+      ),
+    );
   }
 
   void _navigateToTimeOff() {
@@ -124,27 +180,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
           Positioned(
             top: 70,
             right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
-                Text(
-                  '08:55',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-                SizedBox(height: 1),
-                Text(
-                  'Wednesday, Feb 11',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ],
-            ),
+            child: _buildLiveTimeAndDate(), //time otomatis
           ),
           Center(
             child: Padding(
@@ -182,6 +218,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                         0: FlexColumnWidth(1),
                         1: FlexColumnWidth(2),
                         2: FlexColumnWidth(1),
+                        3: FlexColumnWidth(1)
                       },
                       children: [
                         TableRow(
@@ -222,6 +259,17 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                 ),
                               ),
                             ),
+                           Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                'Detail',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         ...requests.map((request) {
@@ -230,7 +278,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                               Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Text(
-                                  request['dateRequest'] ?? '',
+                                  request['no_request'] ?? '',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 12,
@@ -255,6 +303,16 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                   style: const TextStyle(
                                     fontSize: 12,
                                   ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: IconButton(
+                                  icon: const Icon(Icons.info_outline),
+                                  iconSize: 24,
+                                  onPressed: () {
+                                    _navigateToTimeOffDetail(request);
+                                  },
                                 ),
                               ),
                             ],
