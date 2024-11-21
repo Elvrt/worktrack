@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:worktrack/navbar.dart';
+import 'package:worktrack/Report/reportdetail.dart';
 
 void main() {
   runApp(const ReportMonthlyApp());
@@ -27,7 +29,8 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  final Dio _dio = Dio(BaseOptions(baseUrl: 'http://localhost:8000/api/showreport'));
+  final Dio _dio = Dio(BaseOptions(
+      baseUrl: 'http://localhost:8000/api/showreport?month=2024-11'));
   List<dynamic> _reports = [];
   bool _isLoading = true;
 
@@ -42,9 +45,12 @@ class _ReportPageState extends State<ReportPage> {
       _isLoading = true;
     });
     try {
-      final response = await _dio.get('/reports', queryParameters: {'month': month});
+      final response =
+          await _dio.get('/reports', queryParameters: {'month': month});
       setState(() {
+        // Sort the reports by absence_date
         _reports = response.data['data'];
+        _reports.sort((a, b) => a['absence_date'].compareTo(b['absence_date']));
         _isLoading = false;
       });
     } catch (error) {
@@ -93,8 +99,7 @@ class _ReportPageState extends State<ReportPage> {
                   icon: const Icon(Icons.arrow_back_ios_new),
                   color: Colors.black,
                   onPressed: () {
-                    // Fetch data for the previous month
-                    _fetchReports('2024-10'); // Example for October
+                    _fetchReports('2024-10'); // Fetch data for October
                   },
                 ),
                 const Text(
@@ -111,8 +116,7 @@ class _ReportPageState extends State<ReportPage> {
                   icon: const Icon(Icons.arrow_forward_ios),
                   color: Colors.black,
                   onPressed: () {
-                    // Fetch data for the next month
-                    _fetchReports('2024-12'); // Example for December
+                    _fetchReports('2024-12'); // Fetch data for December
                   },
                 ),
               ],
@@ -124,44 +128,89 @@ class _ReportPageState extends State<ReportPage> {
               : _reports.isEmpty
                   ? const Center(child: Text('No reports found'))
                   : Expanded(
-                      child: ListView.builder(
-                        itemCount: _reports.length,
-                        itemBuilder: (context, index) {
-                          final report = _reports[index];
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16.0, vertical: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  report['absence_date'] ?? '-',
-                                  style: const TextStyle(fontSize: 16),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: DataTable(
+                            columns: const [
+                              DataColumn(
+                                label: Text(
+                                  'Date',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                Text(
-                                  report['clock_in'] ?? '-',
-                                  style: const TextStyle(
-                                    color: Color(0xFF09740E),
-                                    fontSize: 16,
-                                  ),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Clock In',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                Text(
-                                  report['clock_out'] ?? '-',
-                                  style: const TextStyle(fontSize: 16),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Clock Out',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                Text(
-                                  report['activity_title'] ?? '-',
-                                  style: const TextStyle(fontSize: 16),
+                              ),
+                              DataColumn(
+                                label: Text(
+                                  'Activity Title',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                              ],
-                            ),
-                          );
-                        },
+                              ),
+                            ],
+                            rows: _reports.map((report) {
+                              return DataRow(
+                                  cells: [
+                                    DataCell(Text(
+                                      report['absence_date']?.toString() ?? '-',
+                                    )),
+                                    DataCell(Text(
+                                      report['clock_in'] ?? '-',
+                                      style: TextStyle(
+                                        color: _getClockInColor(
+                                            report['clock_in']),
+                                      ),
+                                    )),
+                                    DataCell(Text(
+                                      report['clock_out'] ?? '-',
+                                      style: TextStyle(
+                                        color: _getClockOutColor(
+                                            report['clock_out']),
+                                      ),
+                                    )),
+                                    DataCell(Text(
+                                      report['activity_title'] ?? '-',
+                                    )),
+                                  ]);
+                            }).toList(),
+                          ),
+                        ),
                       ),
                     ),
         ],
       ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 0),
     );
+  }
+
+  // Determine clock_in color
+  Color _getClockInColor(String? clockIn) {
+    if (clockIn == null) return Colors.black;
+    final time = TimeOfDay(
+        hour: int.parse(clockIn.split(':')[0]),
+        minute: int.parse(clockIn.split(':')[1]));
+    return time.hour > 8 || (time.hour == 8 && time.minute > 0)
+        ? Colors.red
+        : Colors.green;
+  }
+
+  // Determine clock_out color
+  Color _getClockOutColor(String? clockOut) {
+    if (clockOut == null) return Colors.black;
+    final time = TimeOfDay(
+        hour: int.parse(clockOut.split(':')[0]),
+        minute: int.parse(clockOut.split(':')[1]));
+    return time.hour < 17 ? Colors.red : Colors.green;
   }
 }
