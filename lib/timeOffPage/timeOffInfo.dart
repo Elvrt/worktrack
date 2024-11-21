@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'timeOffForm.dart';
 import 'package:worktrack/homepage/home_screen.dart';
-
+import 'package:worktrack/login.dart'; // Untuk akses authToken
+import 'timeOffDetail.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -20,7 +22,7 @@ class timeOffInfo extends StatefulWidget {
 
 class _TimeOffScreenState extends State<timeOffInfo> {
   List<Map<String, String>> requests = [];
-  final String apiUrl = "http://localhost:8000/api/timeoff/";
+  final String apiUrl = "${urlDomain}api/timeoff/";
   final Dio _dio = Dio();
   int currentPage = 1;
   bool isLastPage = false;
@@ -33,14 +35,23 @@ class _TimeOffScreenState extends State<timeOffInfo> {
 
   Future<void> fetchRequests(int page) async {
     try {
+      // Tambahkan token ke header
+      final options = Options(
+        headers: {
+          'Authorization': 'Bearer $authToken', // Gunakan token dari login.dart
+        },
+      );
+
       // Memuat data dari API dengan parameter halaman dan limit
-      Response response = await _dio.get(apiUrl, queryParameters: {
-        'page': page,
-        'limit': 5,
-      });
+      Response response = await _dio.get(
+        apiUrl,
+        queryParameters: {'page': page, 'limit': 5},
+        options: options,
+      );
 
       // Cek format data apakah sesuai dengan yang diharapkan
-      var decodedData = response.data is String ? jsonDecode(response.data) : response.data;
+      var decodedData =
+          response.data is String ? jsonDecode(response.data) : response.data;
       print("Fetching page: $page");
       print("Response data: $decodedData");
 
@@ -50,13 +61,20 @@ class _TimeOffScreenState extends State<timeOffInfo> {
         setState(() {
           // Tampilkan hanya data dari halaman saat ini
           requests = data.map((item) => {
-            'dateRequest': item['time_off_id'].toString(),
-            'workLeave': '${item['start_date']} - ${item['end_date']}',
-            'status': item['status'].toString(),
-          }).toList();
+                    'no_request': item['time_off_id'].toString(),
+                    'workLeave': '${item['start_date']} - ${item['end_date']}',
+                    'status': item['status'].toString(),
+                    'employee_id' : item ['employee_id'].toString(),
+                    'employee_name': item['employee']['name'].toString(), // Ambil nama karyawan
+                    'reason' : item['reason'].toString(),
+                    'letter' : item['letter'].toString()
+                    
+                  })
+              .toList();
 
           // Perbarui kondisi isLastPage berdasarkan jumlah item di halaman
-          isLastPage = data.length < 5; // Jika data kurang dari limit, artinya halaman terakhir
+          isLastPage = data.length <
+              5; // Jika data kurang dari limit, artinya halaman terakhir
           print("Is last page: $isLastPage");
         });
       } else {
@@ -67,6 +85,55 @@ class _TimeOffScreenState extends State<timeOffInfo> {
     }
   }
 
+    // Format waktu
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
+  }
+
+  // Format tanggal
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
+  }
+
+ // model tanggal dan waktu
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatTime(now),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              _formatDate(now),
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  void _navigateToTimeOffDetail(Map<String, String> request) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TimeOffDetail( timeOffRequest: request),
+      ),
+    );
+  }
 
   void _navigateToTimeOff() {
     Navigator.of(context).push(
@@ -74,7 +141,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
     );
   }
 
-   void _loadNextPage() {
+  void _loadNextPage() {
     if (!isLastPage) {
       setState(() {
         currentPage++;
@@ -103,34 +170,17 @@ class _TimeOffScreenState extends State<timeOffInfo> {
             child: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () {
-                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreenPage()),
+                );
               },
             ),
           ),
           Positioned(
             top: 70,
             right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
-                Text(
-                  '08:55',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-                SizedBox(height: 1),
-                Text(
-                  'Wednesday, Feb 11',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ],
-            ),
+            child: _buildLiveTimeAndDate(), //time otomatis
           ),
           Center(
             child: Padding(
@@ -168,6 +218,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                         0: FlexColumnWidth(1),
                         1: FlexColumnWidth(2),
                         2: FlexColumnWidth(1),
+                        3: FlexColumnWidth(1)
                       },
                       children: [
                         TableRow(
@@ -208,6 +259,17 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                 ),
                               ),
                             ),
+                           Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                'Detail',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                         ...requests.map((request) {
@@ -216,7 +278,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                               Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Text(
-                                  request['dateRequest'] ?? '',
+                                  request['no_request'] ?? '',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
                                     fontSize: 12,
@@ -241,6 +303,16 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                   style: const TextStyle(
                                     fontSize: 12,
                                   ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8),
+                                child: IconButton(
+                                  icon: const Icon(Icons.info_outline),
+                                  iconSize: 24,
+                                  onPressed: () {
+                                    _navigateToTimeOffDetail(request);
+                                  },
                                 ),
                               ),
                             ],
