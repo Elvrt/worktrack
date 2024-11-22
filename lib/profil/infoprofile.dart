@@ -21,6 +21,7 @@ class _InfoProfileState extends State<InfoProfile> {
   final TextEditingController addressController = TextEditingController();
   final TextEditingController positionController = TextEditingController();
   final TextEditingController numberController = TextEditingController();
+  final TextEditingController profileController = TextEditingController();
 
   String? errorMessage;
 
@@ -29,7 +30,7 @@ class _InfoProfileState extends State<InfoProfile> {
     try {
       final dio = Dio();
       final response = await dio.get(
-        '${urlDomain}api/employee', // Ganti dengan endpoint API Anda
+        '${urlDomain}api/employee/show', // Ganti dengan endpoint API Anda
         options: Options(
           headers: {
             'Authorization': 'Bearer $authToken', // Kirim token di header
@@ -43,10 +44,11 @@ class _InfoProfileState extends State<InfoProfile> {
           nameController.text = data['employee']['name'] ?? '';
           phoneController.text = data['employee']['phone_number'] ?? '';
           dateController.text = data['employee']['date_of_birth'] ?? '';
-          usernameController.text = data['username'] ?? '';
+          usernameController.text = data['user']['username'] ?? '';
           addressController.text = data['employee']['address'] ?? '';
           positionController.text = data['role']['position'] ?? '';
           numberController.text = data['employee']['employee_number'] ?? '';
+          profileController.text = data['employee']['profile'] ?? '';
         });
       } else {
         setState(() {
@@ -81,11 +83,36 @@ class _InfoProfileState extends State<InfoProfile> {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20.0),
-                    child: Image.network(
-                      'https://awsimages.detik.net.id/community/media/visual/2018/06/10/82fffd14-c0d7-478b-a722-5169c8e53e39.jpeg?w=600&q=90',
-                      height: 94,
-                      fit: BoxFit.cover,
-                    ),
+                    child: profileController.text.isNotEmpty &&
+                            Uri.tryParse(profileController.text)
+                                    ?.hasAbsolutePath ==
+                                true
+                        ? Image.network(
+                            profileController.text,
+                            height: 94,
+                            width: 94,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 94,
+                                width: 94,
+                                color: Colors.grey[300],
+                                child: Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            height: 94,
+                            width: 94,
+                            color: Colors.grey[300],
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.grey,
+                            ),
+                          ),
                   ),
                   SizedBox(height: 20),
                   if (errorMessage != null)
