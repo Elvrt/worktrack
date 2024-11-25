@@ -4,10 +4,6 @@ import 'package:worktrack/profil/editprofile.dart';
 import 'package:worktrack/navbar.dart';
 import 'package:worktrack/login.dart';
 
-void main() {
-  runApp(InfoProfile());
-}
-
 class InfoProfile extends StatefulWidget {
   @override
   _InfoProfileState createState() => _InfoProfileState();
