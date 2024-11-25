@@ -24,40 +24,31 @@ class ClockInApp extends StatelessWidget {
 class ClockInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        flexibleSpace: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                _formatTime(DateTime.now()),
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                _formatDate(DateTime.now()),
-                style: TextStyle(fontSize: 15, color: Colors.grey),
-              ),
-            ],
+  return Scaffold(
+    appBar: AppBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      toolbarHeight:150, // Sesuaikan tinggi AppBar
+      automaticallyImplyLeading: false, // Nonaktifkan back button default
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () {
+              Navigator.pop(context); // Atau sesuaikan dengan navigasi Anda
+            },
           ),
-        ),
+          _buildLiveTimeAndDate(),
+        ],
       ),
+    ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 17),
               Center(
                 child: Text(
                   'Clock In',
@@ -72,32 +63,38 @@ class ClockInPage extends StatelessWidget {
               ),
               SizedBox(height: 20),
               Text(
-                'Your Location',
+                ' Your Location',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               TextField(
                 maxLines: 4,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                 ),
               ),
               SizedBox(height: 10),
               TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                   labelText: 'Location: Unknown - Khalid',
                 ),
               ),
               SizedBox(height: 20),
               Text(
-                'Goal',
+                ' Goal',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
               TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                   labelText: 'Debug ios app',
                 ),
               ),
@@ -134,11 +131,44 @@ class ClockInPage extends StatelessWidget {
   }
 
   String _formatTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime);
+    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
   }
 
+  // Format tanggal
   String _formatDate(DateTime dateTime) {
-    return DateFormat('EEEE, MMM d').format(dateTime);
+    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
   }
-}
+
+ // model tanggal dan waktu
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatTime(now),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              _formatDate(now),
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  }
+
 

@@ -22,44 +22,32 @@
   }
   class ClockOutPage extends StatelessWidget {
     @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
+     @override
+  Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      elevation: 0,
+      backgroundColor: Colors.transparent,
+      toolbarHeight:150, // Sesuaikan tinggi AppBar
+      automaticallyImplyLeading: false, // Nonaktifkan back button default
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context); // Atau sesuaikan dengan navigasi Anda
             },
           ),
-        
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    _formatTime(DateTime.now()),
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    _formatDate(DateTime.now()),
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+          _buildLiveTimeAndDate(),
+        ],
+      ),
+    ),
         body: Padding(
-          padding: const EdgeInsets.all(20.0),
+         padding: const EdgeInsets.symmetric(horizontal: 20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
               Center(
                 child: Text(
                   'Clock Out',
@@ -68,40 +56,46 @@
               ),
               SizedBox(height: 30),
               Text(
-                'Title of Your Activity Today',
+                ' Title of Your Activity Today',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                 ),
               ),
               SizedBox(height: 20),
               Text(
-                'Describe Your Activity Today',
+                ' Describe Your Activity Today',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               TextField(
                 maxLines: 4,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                 ),
               ),
               SizedBox(height: 20),
               Text(
-                'Take a Screenshot of Your Activity (jpg,jpeg,png)',
+                ' Take a Screenshot of Your Activity (jpg,jpeg,png)',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               TextField(
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                 ),
               ),
               SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 225, 203, 11),
+                    backgroundColor: const Color.fromARGB(255, 239, 218, 26),
                     padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -127,11 +121,43 @@
       );
     }
 
-    String _formatTime(DateTime dateTime) {
-      return DateFormat('HH:mm').format(dateTime);
-    }
+ String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
+  }
 
-    String _formatDate(DateTime dateTime) {
-      return DateFormat('EEEE, MMM d').format(dateTime);
-    }
+  // Format tanggal
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
+  }
+
+ // model tanggal dan waktu
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatTime(now),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              _formatDate(now),
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
   }
