@@ -7,12 +7,6 @@ import 'package:worktrack/login.dart'; // Untuk akses authToken
 import 'timeOffDetail.dart';
 import 'package:intl/intl.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: const timeOffInfo(),
-  ));
-}
-
 class timeOffInfo extends StatefulWidget {
   const timeOffInfo({super.key});
 

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:worktrack/navbar.dart';
 import 'package:worktrack/Report/reportdetail.dart';
-
-void main() {
-  runApp(const ReportMonthlyApp());
-}
+import 'package:worktrack/navbar.dart';
+import 'package:worktrack/login.dart';
 
 class ReportMonthlyApp extends StatelessWidget {
   const ReportMonthlyApp({super.key});
@@ -29,36 +26,63 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  final Dio _dio = Dio(BaseOptions(
-      baseUrl: 'http://localhost:8000/api/showreport?month=2024-11'));
+  late Dio _dio;
   List<dynamic> _reports = [];
   bool _isLoading = true;
+  String _currentMonth = '2024-11'; // Default bulan November 2024
 
   @override
   void initState() {
     super.initState();
-    _fetchReports('2024-11'); // Default filter for November 2024
+    _initializeDio(); // Inisialisasi Dio dengan token
+    _fetchReports(_currentMonth); // Ambil laporan berdasarkan bulan default
   }
 
+  // Inisialisasi Dio dengan authToken
+  void _initializeDio() {
+    _dio = Dio(BaseOptions(
+      baseUrl: '${urlDomain}api',
+      headers: {
+        'Authorization': 'Bearer $authToken',
+        'Content-Type': 'application/json',
+      },
+    ));
+  }
+
+  // Fungsi untuk mengambil data laporan berdasarkan bulan
   Future<void> _fetchReports(String month) async {
     setState(() {
       _isLoading = true;
     });
     try {
       final response =
-          await _dio.get('/reports', queryParameters: {'month': month});
-      setState(() {
-        // Sort the reports by absence_date
-        _reports = response.data['data'];
-        _reports.sort((a, b) => a['absence_date'].compareTo(b['absence_date']));
-        _isLoading = false;
-      });
+          await _dio.get('/report', queryParameters: {'month': month});
+      if (response.statusCode == 200 && response.data['status'] == 'success') {
+        setState(() {
+          _reports = response.data['data'] ?? [];
+          _reports
+              .sort((a, b) => a['absence_date'].compareTo(b['absence_date']));
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _reports = [];
+          _isLoading = false;
+        });
+      }
     } catch (error) {
       setState(() {
         _isLoading = false;
       });
-      print('Error fetching reports: $error');
     }
+  }
+
+  // Fungsi untuk berpindah bulan
+  void _changeMonth(String newMonth) {
+    setState(() {
+      _currentMonth = newMonth;
+    });
+    _fetchReports(newMonth);
   }
 
   @override
@@ -80,6 +104,7 @@ class _ReportPageState extends State<ReportPage> {
       ),
       body: Column(
         children: [
+          // Header untuk navigasi bulan
           Container(
             width: double.infinity,
             height: 51,
@@ -99,12 +124,12 @@ class _ReportPageState extends State<ReportPage> {
                   icon: const Icon(Icons.arrow_back_ios_new),
                   color: Colors.black,
                   onPressed: () {
-                    _fetchReports('2024-10'); // Fetch data for October
+                    _changeMonth('2024-10'); // Pindah ke bulan Oktober
                   },
                 ),
-                const Text(
-                  'November 2024',
-                  style: TextStyle(
+                Text(
+                  _getMonthName(_currentMonth),
+                  style: const TextStyle(
                     color: Colors.black,
                     fontFamily: 'Inter',
                     fontSize: 24,
@@ -116,13 +141,14 @@ class _ReportPageState extends State<ReportPage> {
                   icon: const Icon(Icons.arrow_forward_ios),
                   color: Colors.black,
                   onPressed: () {
-                    _fetchReports('2024-12'); // Fetch data for December
+                    _changeMonth('2024-12'); // Pindah ke bulan Desember
                   },
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10),
+          // Tabel laporan
           _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _reports.isEmpty
@@ -154,35 +180,51 @@ class _ReportPageState extends State<ReportPage> {
                               ),
                               DataColumn(
                                 label: Text(
-                                  'Activity Title',
+                                  'Detail',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ],
                             rows: _reports.map((report) {
                               return DataRow(
-                                  cells: [
-                                    DataCell(Text(
-                                      report['absence_date']?.toString() ?? '-',
-                                    )),
-                                    DataCell(Text(
-                                      report['clock_in'] ?? '-',
-                                      style: TextStyle(
-                                        color: _getClockInColor(
-                                            report['clock_in']),
+                                cells: [
+                                  DataCell(Text(
+                                    _formatDate(
+                                        report['absence']['absence_date']),
+                                  )),
+                                  DataCell(Text(
+                                    _formatTime(report['absence']['clock_in']),
+                                    style: TextStyle(
+                                      color: _getClockInColor(
+                                          report['absence']['clock_in']),
+                                    ),
+                                  )),
+                                  DataCell(Text(
+                                    _formatTime(report['absence']['clock_out']),
+                                    style: TextStyle(
+                                      color: _getClockOutColor(
+                                          report['absence']['clock_out']),
+                                    ),
+                                  )),
+                                  DataCell(
+                                    Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: IconButton(
+                                        icon: const Icon(Icons.info_outline),
+                                        iconSize: 24,
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ReportDeail()),
+                                          );
+                                        },
                                       ),
-                                    )),
-                                    DataCell(Text(
-                                      report['clock_out'] ?? '-',
-                                      style: TextStyle(
-                                        color: _getClockOutColor(
-                                            report['clock_out']),
-                                      ),
-                                    )),
-                                    DataCell(Text(
-                                      report['activity_title'] ?? '-',
-                                    )),
-                                  ]);
+                                    ),
+                                  ),
+                                ],
+                              );
                             }).toList(),
                           ),
                         ),
@@ -194,23 +236,47 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  // Determine clock_in color
+  // Format tanggal menjadi 'dd'
+  String _formatDate(String? date) {
+    if (date == null) return '-';
+    final parsedDate = DateTime.parse(date);
+    return '${parsedDate.day.toString().padLeft(2, '0')}';
+  }
+
+  // Format waktu menjadi 'h:i'
+  String _formatTime(String? time) {
+    if (time == null) return '-';
+    final parts = time.split(':');
+    final hour = int.parse(parts[0]);
+    final minute = int.parse(parts[1]);
+    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
+  }
+
+  // Fungsi untuk mendapatkan nama bulan dari format YYYY-MM
+  String _getMonthName(String month) {
+    final date = DateTime.parse(month + '-01');
+    return '${date.month == 11 ? "November" : date.month == 12 ? "December" : "October"} ${date.year}';
+  }
+
+  // Fungsi untuk menentukan warna teks clock_in
   Color _getClockInColor(String? clockIn) {
     if (clockIn == null) return Colors.black;
     final time = TimeOfDay(
-        hour: int.parse(clockIn.split(':')[0]),
-        minute: int.parse(clockIn.split(':')[1]));
+      hour: int.parse(clockIn.split(':')[0]),
+      minute: int.parse(clockIn.split(':')[1]),
+    );
     return time.hour > 8 || (time.hour == 8 && time.minute > 0)
         ? Colors.red
         : Colors.green;
   }
 
-  // Determine clock_out color
+  // Fungsi untuk menentukan warna teks clock_out
   Color _getClockOutColor(String? clockOut) {
     if (clockOut == null) return Colors.black;
     final time = TimeOfDay(
-        hour: int.parse(clockOut.split(':')[0]),
-        minute: int.parse(clockOut.split(':')[1]));
+      hour: int.parse(clockOut.split(':')[0]),
+      minute: int.parse(clockOut.split(':')[1]),
+    );
     return time.hour < 17 ? Colors.red : Colors.green;
   }
 }
