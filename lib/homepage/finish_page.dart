@@ -20,17 +20,12 @@ class FinishApp extends StatelessWidget {
     );
   }
 }
+
 class finishpage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true, // Extend the body behind the AppBar
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        
-      ),
+      backgroundColor: Colors.white,  
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
@@ -153,32 +148,90 @@ class finishpage extends StatelessWidget {
             ),
             SizedBox(height: 20),
             // Clock In / Debug iOS App / Clock Out
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+            Column(
               children: [
-                Column(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(Icons.login, size: 40, color: Colors.yellow),
-                    SizedBox(height: 5),
-                    Text('Clock In', style: TextStyle(fontSize: 16)),
+                    SizedBox(
+                      width: 100, // Lebar tetap untuk kolom
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.history, size: 40, color: Colors.yellow),
+                          SizedBox(height: 5),
+                          Text('08:23', style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.local_fire_department, size: 40, color: Colors.yellow),
+                          SizedBox(height: 5),
+                          Text('Debug iOS', style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.update, size: 40, color: Colors.yellow),
+                          SizedBox(height: 5),
+                          Text('17:20', style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-                Column(
+                SizedBox(height: 10), // Jarak antar baris
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(Icons.flag, size: 40, color: Colors.yellow),
-                    SizedBox(height: 5),
-                    Text('Debug iOS App', style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Icon(Icons.logout, size: 40, color: Colors.yellow),
-                    SizedBox(height: 5),
-                    Text('Clock Out', style: TextStyle(fontSize: 16)),
+                    SizedBox(
+                      width: 100, // Lebar tetap untuk kolom
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Clock In',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Goal',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      width: 100,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Clock Out',
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
+
             SizedBox(height: 20),
             // Event Information
             Container(
@@ -202,13 +255,22 @@ class finishpage extends StatelessWidget {
                       Text('Meeting with HRD', style: TextStyle(fontSize: 16)),
                     ],
                   ),
+                  SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('23 Jan 2024', style: TextStyle(fontSize: 16)),
+                      Text('12:00', style: TextStyle(fontSize: 16)),
+                      Text('Meeting with HRD', style: TextStyle(fontSize: 16)),
+                    ],
+                  ),
                 ],
               ),
             ),
           ],
         ),
       ),
-           bottomNavigationBar: BottomNavBar(currentIndex: 1),
+      bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 
