@@ -3,8 +3,7 @@ import 'timeOffInfo.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:dio/dio.dart';
 import 'dart:io';
-
-// Gunakan authToken dari login.dart
+import 'package:intl/intl.dart';
 import 'package:worktrack/login.dart';
 
 class timeOff extends StatefulWidget {
@@ -76,6 +75,47 @@ Future<void> submitTimeOff() async {
   }
 }
 
+    // Format waktu
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
+  }
+
+  // Format tanggal
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
+  }
+
+ // model tanggal dan waktu
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatTime(now),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              _formatDate(now),
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,27 +137,7 @@ Future<void> submitTimeOff() async {
           Positioned(
             top: 70,
             right: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
-                Text(
-                  '08:55',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-                SizedBox(height: 1),
-                Text(
-                  'Wednesday, Feb 11',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-              ],
-            ),
+            child: _buildLiveTimeAndDate(), //time otomatis
           ),
           Center(
             child: SingleChildScrollView(
