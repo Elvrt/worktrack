@@ -1,13 +1,12 @@
-import 'dart:async'; 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:worktrack/homepage/clock_in_page.dart'; 
+import 'package:dio/dio.dart';
+import 'package:worktrack/homepage/clock_in_page.dart';
 import 'package:worktrack/navbar.dart';
 import 'package:worktrack/timeOffPage/timeOffForm.dart';
+import 'package:worktrack/login.dart';
 
-void main() {
-  runApp(HomeScreenPage());
-}
 
 class HomeScreenPage extends StatelessWidget {
   @override
@@ -23,19 +22,129 @@ class HomeScreenPage extends StatelessWidget {
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String employeeName = "Loading..."; 
+  String employeeNumber = "Loading...";
+  String profileImageUrl = "";
+ List<Map<String, String>> events = [];
+  String eventTime = "Loading...";
+  String eventInformation = "Loading...";
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProfile(); 
+    fetchEventData();
+  }
+
+  Future<void> fetchProfile() async {
+  try {
+    final dio = Dio();
+    final response = await dio.get(
+      '${urlDomain}api/home',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final data = response.data;
+
+      setState(() {
+        employeeName = data['employee']['name'] ?? 'Unknown';
+        employeeNumber = data['employee']['employee_number'] ?? 'N/A';
+        profileImageUrl = data['employee']['profile'] ?? '';
+      });
+    } else {
+      setState(() {
+        employeeName = "Failed to load";
+        employeeNumber = "N/A";
+        profileImageUrl = "";
+      });
+    }
+  } catch (e) {
+    setState(() {
+      employeeName = "Error loading profile";
+      employeeNumber = "N/A";
+      profileImageUrl = "";
+    });
+  }
+}
+
+  Future<void> fetchEventData() async {
+  try {
+    final dio = Dio();
+    final response = await dio.get(
+      '${urlDomain}api/home',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      final data = response.data;
+
+      setState(() {
+        events.clear(); // Bersihkan daftar sebelumnya
+        if (data['event'] != null && data['event'].isNotEmpty) {
+          for (var event in data['event']) {
+            events.add({
+              'event_date': event['event_date'] ?? 'Unknown date',
+              'event_time': event['event_time'] ?? 'Unknown time',
+              'information': event['information'] ?? 'No details',
+            });
+          }
+        } else {
+          events.add({
+            'event_date': 'No upcoming events',
+            'event_time': '',
+            'information': '',
+          });
+        }
+      });
+    } else {
+      setState(() {
+        events.add({
+          'event_date': 'Failed to load',
+          'event_time': '',
+          'information': '',
+        });
+      });
+    }
+  } catch (e) {
+    setState(() {
+      events.add({
+        'event_date': 'Error loading event',
+        'event_time': '',
+        'information': '',
+      });
+    });
+  }
+}
+
+
+  
+  @override 
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true, // Extend the body behind the AppBar
+      extendBodyBehindAppBar: true,
       appBar: _buildAppBar(),
       body: _buildBody(context),
       bottomNavigationBar: BottomNavBar(currentIndex: 1),
     );
   }
 
-  // AppBar
   AppBar _buildAppBar() {
     return AppBar(
       elevation: 0,
@@ -43,7 +152,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // Main body of the screen
   Widget _buildBody(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -51,78 +159,64 @@ class HomeScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: kToolbarHeight), // Space for the AppBar height
-          
-          // Profile Section
+          SizedBox(height: kToolbarHeight),
           _buildProfileSection(),
-          
-          const SizedBox(height: 10),
-          
-          // Live Time
+          SizedBox(height: 10),
           _buildLiveTime(),
-          
-          const SizedBox(height: 5),
-          
-          // Live Date
+          SizedBox(height: 5),
           _buildLiveDate(),
-          
-          const SizedBox(height: 15),
-          
-          // Clock In Button with Time Off Button
+          SizedBox(height: 15),
           _buildClockInButton(context),
-          
-          const SizedBox(height: 10),
-          
-          // Location Information
-          const Text(
+          SizedBox(height: 10),
+          Text(
             'Location: Unknown - Khalid',
             style: TextStyle(fontSize: 16, color: Colors.grey),
           ),
-          
-          const SizedBox(height: 20),
-          
-          // Action Buttons (Clock In, Debug iOS, Clock Out)
+          SizedBox(height: 20),
           _buildActionButtons(),
-          
-          const SizedBox(height: 20),
-          
-          // Event Information
+          SizedBox(height: 20),
           _buildEventInfo(),
         ],
       ),
     );
   }
 
-  // Profile Section
   Widget _buildProfileSection() {
-    return Row(
-      children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundImage: NetworkImage(
-            'https://via.placeholder.com/150', // Replace with profile image URL
+  // Ensure name is limited to 10 characters, and add '...' if truncated
+  String displayName = employeeName.length > 10 
+      ? '${employeeName.substring(0, 10)}...' 
+      : employeeName;
+
+  return Row(
+    children: [
+      CircleAvatar(
+        radius: 20,
+        backgroundImage: profileImageUrl.isNotEmpty
+            ? NetworkImage(profileImageUrl)
+            : AssetImage('img/default_profile.png') as ImageProvider, // Fallback image
+      ),
+      SizedBox(width: 10),
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            displayName,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              'BONIFASIUS',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              '1231231',
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+          Text(
+            employeeNumber,
+            style: TextStyle(fontSize: 16),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
+  
 
   // Live Time Stream
   Widget _buildLiveTime() {
@@ -322,32 +416,76 @@ class HomeScreen extends StatelessWidget {
   }
 
   // Event Info Widget
-  Widget _buildEventInfo() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.grey[200],
-      ),
-      child: Column(
-        children: const [
-          Text(
-            'Event',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('14 Feb 2024', style: TextStyle(fontSize: 16)),
-              Text('13:00', style: TextStyle(fontSize: 16)),
-              Text('Meeting with HRD', style: TextStyle(fontSize: 16)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+Widget _buildEventInfo() {
+  return Container(
+    padding: const EdgeInsets.all(15),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(10),
+      color: Colors.grey[200],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Events',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        events.isNotEmpty
+            ? ListView.separated(
+                shrinkWrap: true, // Agar ListView tidak memenuhi seluruh layar
+                physics: NeverScrollableScrollPhysics(), // Non-scrollable
+                itemCount: events.length,
+                separatorBuilder: (context, index) => Divider(
+                  color: Colors.grey[400],
+                  thickness: 0.5,
+                ),
+                itemBuilder: (context, index) {
+                  final event = events[index];
+                  return Row(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          event['event_date'] ?? '',
+                          style: TextStyle(fontSize: 16, color: Colors.black87),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Container(
+                        width: 80,
+                        child: Text(
+                          event['event_time'] ?? '',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          event['information'] ?? '',
+                          style: TextStyle(fontSize: 16, color: Colors.black54),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              )
+            : const Text(
+                'No events available',
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+      ],
+    ),
+  );
+}
 
   // Helper to build action columns
   Column _buildActionColumn(IconData icon, String label) {
