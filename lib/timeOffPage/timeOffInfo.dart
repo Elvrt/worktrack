@@ -27,7 +27,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
     fetchRequests(currentPage);
   }
 
-  Future<void> fetchRequests(int page) async {
+   Future<void> fetchRequests(int page) async {
     try {
       // Tambahkan token ke header
       final options = Options(
@@ -39,7 +39,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
       // Memuat data dari API dengan parameter halaman dan limit
       Response response = await _dio.get(
         apiUrl,
-        queryParameters: {'page': page, 'limit': 5},
+        queryParameters: {'page': page, 'limit': 4},
         options: options,
       );
 
@@ -62,13 +62,11 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                     'employee_name': item['employee']['name'].toString(), // Ambil nama karyawan
                     'reason' : item['reason'].toString(),
                     'letter' : item['letter'].toString()
-                    
                   })
               .toList();
 
           // Perbarui kondisi isLastPage berdasarkan jumlah item di halaman
-          isLastPage = data.length <
-              5; // Jika data kurang dari limit, artinya halaman terakhir
+          isLastPage = data.length < 4; 
           print("Is last page: $isLastPage");
         });
       } else {
@@ -119,7 +117,6 @@ class _TimeOffScreenState extends State<timeOffInfo> {
       },
     );
   }
-
 
   void _navigateToTimeOffDetail(Map<String, String> request) {
     Navigator.of(context).push(
@@ -253,7 +250,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                 ),
                               ),
                             ),
-                           Padding(
+                            Padding(
                               padding: EdgeInsets.all(8),
                               child: Text(
                                 'Detail',
@@ -275,7 +272,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                   request['no_request'] ?? '',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                   ),
                                 ),
                               ),
@@ -285,7 +282,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                   request['workLeave'] ?? '',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                   ),
                                 ),
                               ),
@@ -295,7 +292,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                                   request['status'] ?? '',
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11,
                                   ),
                                 ),
                               ),
@@ -316,34 +313,34 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: currentPage > 1 ? _loadPreviousPage : null,
-                        child: const Text('Previous'),
-                      ),
-                      ElevatedButton(
-                        onPressed: !isLastPage ? _loadNextPage : null,
-                        child: const Text('Next'),
-                      ),
-                    ],
+               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ElevatedButton(
+                    onPressed: currentPage > 1 ? _loadPreviousPage : null,
+                    child: const Text('Previous'),
                   ),
-                  const SizedBox(height: 40),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: FloatingActionButton(
-                      onPressed: _navigateToTimeOff,
-                      backgroundColor: const Color(0xFFF6D647),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40),
-                      ),
-                      child: const Icon(Icons.add),
-                    ),
+                  ElevatedButton(
+                    onPressed: !isLastPage ? _loadNextPage : null,
+                    child: const Text('Next'),
                   ),
                 ],
               ),
+                ],
+              ),
             ),
+          ),
+         Positioned(
+            bottom: 70,
+            right: 20,
+            child: FloatingActionButton(
+                onPressed: _navigateToTimeOff,
+                backgroundColor: const Color(0xFFF6D647),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: const Icon(Icons.add),
+              ),
           ),
         ],
       ),
