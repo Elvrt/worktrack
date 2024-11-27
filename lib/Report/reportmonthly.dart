@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:worktrack/Report/reportdetail.dart';
 import 'package:worktrack/navbar.dart';
+import 'package:intl/intl.dart';
 import 'package:worktrack/login.dart';
 
 class ReportMonthlyApp extends StatelessWidget {
@@ -90,20 +91,30 @@ class _ReportPageState extends State<ReportPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text(
-          'REPORT',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Urbanist',
-          ),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            _buildLiveTimeAndDate(),
+          ],
         ),
-        centerTitle: true,
-        toolbarHeight: 100,
-        backgroundColor: Colors.white,
       ),
       body: Column(
         children: [
+          Center(
+            child: Text(
+              'REPORT',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 24,
+                letterSpacing: 4,
+                fontFamily: 'inter',
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
           // Header untuk navigasi bulan
           Container(
             width: double.infinity,
@@ -141,7 +152,7 @@ class _ReportPageState extends State<ReportPage> {
                   icon: const Icon(Icons.arrow_forward_ios),
                   color: Colors.black,
                   onPressed: () {
-                    _changeMonth('2024-12'); // Pindah ke bulan Desember
+                    _changeMonth('2024-11'); // Pindah ke bulan Desember
                   },
                 ),
               ],
@@ -206,23 +217,25 @@ class _ReportPageState extends State<ReportPage> {
                                           report['absence']['clock_out']),
                                     ),
                                   )),
-                                  DataCell(
-                                    Padding(
-                                      padding: const EdgeInsets.all(8),
-                                      child: IconButton(
-                                        icon: const Icon(Icons.info_outline),
-                                        iconSize: 24,
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    ReportDeail()),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
+                                 DataCell(
+  Padding(
+    padding: const EdgeInsets.all(8),
+    child: IconButton(
+      icon: const Icon(Icons.info_outline),
+      iconSize: 24,
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReportDetail(
+              reportId: report['id'], // Pass the specific report ID
+            ),
+          ),
+        );
+      },
+    ),
+  ),
+),
                                 ],
                               );
                             }).toList(),
@@ -279,4 +292,47 @@ class _ReportPageState extends State<ReportPage> {
     );
     return time.hour < 17 ? Colors.red : Colors.green;
   }
+
+  // model tanggal dan waktu
+  String formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
+  }
+
+  // Format tanggal
+  String formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM dd')
+        .format(dateTime); // Contoh: Wednesday, Feb 11
+  }
+
+  // model tanggal dan waktu
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              formatTime(now),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              formatDate(now),
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
