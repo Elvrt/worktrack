@@ -5,6 +5,22 @@ import 'package:worktrack/homepage/clock_in_page.dart'; // Import ClockInPage
 import 'package:worktrack/navbar.dart';
 import 'package:worktrack/timeOffPage/timeOffForm.dart';
 import 'package:worktrack/login.dart'; // Import untuk akses authToken
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+Future<Map<String, dynamic>> fetchUserData(String authToken) async {
+  final response = await http.get(
+    Uri.parse('https://your-api-url.com/user'),
+    headers: {'Authorization': 'Bearer $authToken'},
+  );
+
+  if (response.statusCode == 200) {
+    return jsonDecode(response.body);
+  } else {
+    throw Exception('Failed to load user data');
+  }
+}
+
 
 class HomeScreenPage extends StatelessWidget {
   @override
@@ -38,7 +54,7 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: kToolbarHeight), // Space for the AppBar height
 
             // Profile Info
-            Row(
+            const Row(
               children: [
                 CircleAvatar(
                   radius: 20,
