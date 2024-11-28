@@ -228,7 +228,7 @@ class _ReportPageState extends State<ReportPage> {
           context,
           MaterialPageRoute(
             builder: (context) => ReportDetail(
-              reportId: report['id'], // Pass the specific report ID
+              // reportId: report['id'], // Pass the specific report ID
             ),
           ),
         );

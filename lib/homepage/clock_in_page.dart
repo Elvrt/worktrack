@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:worktrack/homepage/home_page_after_clock_in.dart';
 
-
 void main() {
   runApp(ClockInApp());
 }
@@ -24,25 +23,25 @@ class ClockInApp extends StatelessWidget {
 class ClockInPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      toolbarHeight:150, // Sesuaikan tinggi AppBar
-      automaticallyImplyLeading: false, // Nonaktifkan back button default
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context); // Atau sesuaikan dengan navigasi Anda
-            },
-          ),
-          _buildLiveTimeAndDate(),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        toolbarHeight: 150, // Sesuaikan tinggi AppBar
+        automaticallyImplyLeading: false, // Nonaktifkan back button default
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.black),
+              onPressed: () {
+                Navigator.pop(context); // Atau sesuaikan dengan navigasi Anda
+              },
+            ),
+            _buildLiveTimeAndDate(),
+          ],
+        ),
       ),
-    ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: SingleChildScrollView(
@@ -136,10 +135,11 @@ class ClockInPage extends StatelessWidget {
 
   // Format tanggal
   String _formatDate(DateTime dateTime) {
-    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
+    return DateFormat('EEEE, MMM dd')
+        .format(dateTime); // Contoh: Wednesday, Feb 11
   }
 
- // model tanggal dan waktu
+  // model tanggal dan waktu
   Widget _buildLiveTimeAndDate() {
     return StreamBuilder(
       stream: Stream.periodic(const Duration(seconds: 1)),
@@ -169,6 +169,4 @@ class ClockInPage extends StatelessWidget {
       },
     );
   }
-  }
-
-
+}

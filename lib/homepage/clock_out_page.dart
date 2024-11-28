@@ -12,7 +12,7 @@
     Widget build(BuildContext context) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Clock In App',
+        title: 'Clock Out App',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
@@ -106,7 +106,7 @@
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => finishpage()),
+                            builder: (context) => ScreenfinishPage()),
                       );
                     },
                   child: Text(
