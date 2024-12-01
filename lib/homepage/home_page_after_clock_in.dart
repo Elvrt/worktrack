@@ -141,12 +141,14 @@ class _HomeScreenState extends State<HomePageAfterClockIn> {
     );
   }
 
-  AppBar _buildAppBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-    );
-  }
+AppBar _buildAppBar() {
+  return AppBar(
+    elevation: 0,
+    backgroundColor: Colors.transparent,
+    automaticallyImplyLeading: false, // Hilangkan tombol back
+  );
+}
+
 
   Widget _buildBody(BuildContext context) {
     return SingleChildScrollView(
