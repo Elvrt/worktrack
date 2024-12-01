@@ -39,6 +39,7 @@ dependencies:
   geolocator: ^9.0.1
   supabase_flutter: ^0.2.8
   image_picker: ^0.8.9
+  
   google_maps_flutter: ^2.2.0
   fluttertoast: ^8.2.8
 
