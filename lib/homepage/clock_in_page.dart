@@ -3,7 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:dio/dio.dart';
-import 'package:worktrack/homepage/home_page_after_clock_in.dart';
+import 'package:worktrack/homepage/home_screen.dart';
+import 'package:worktrack/login.dart';
 
 void main() {
   runApp(ClockInApp());
@@ -31,28 +32,42 @@ class ClockInPage extends StatefulWidget {
 class _ClockInPageState extends State<ClockInPage> {
   String location = "Unknown";
   String coordinates = "";
-  String goal = "Loading...";
+  String projectTitle = "Loading...";
+  String projectDescription = "Loading...";
   bool isLoading = false;
 
   // Fetch Goal Data
   Future<void> fetchGoalData() async {
     try {
       final dio = Dio();
-      final response =
-          await dio.get('https://fcntlbecmohydmdtutjm.supabase.co/api/goal');
+      final response = await dio.get(
+        '${urlDomain}api/absence/goal',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $authToken',
+          },
+        ),
+      );
 
       if (response.statusCode == 200) {
+        final data = response.data;
+
         setState(() {
-          goal = response.data['goal'] ?? 'No Goal Found';
+          projectTitle =
+              data['data']['goal']['project_title'] ?? 'No Project Title Found';
+          projectDescription = data['data']['goal']['project_description'] ??
+              'No Project Description Found';
         });
       } else {
         setState(() {
-          goal = 'Error loading goal';
+          projectTitle = 'Error loading project title';
+          projectDescription = 'Error loading project description';
         });
       }
     } catch (e) {
       setState(() {
-        goal = 'Failed to load goal';
+        projectTitle = 'Failed to load project title';
+        projectDescription = 'Failed to load description';
       });
     }
   }
@@ -101,11 +116,10 @@ class _ClockInPageState extends State<ClockInPage> {
       // Send location to absence table
       final dio = Dio();
       final response = await dio.post(
-        'https://fcntlbecmohydmdtutjm.supabase.co/api/absence',
+        '${urlDomain}/api/absence/clockin',
         data: {
           'location': location,
           'coordinates': coordinates,
-          'time': DateTime.now().toIso8601String(),
         },
       );
 
@@ -185,6 +199,10 @@ class _ClockInPageState extends State<ClockInPage> {
                 'Goal',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+              Text(
+                'Project Title',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               SizedBox(height: 10),
               Container(
                 padding: EdgeInsets.all(15.0),
@@ -193,8 +211,31 @@ class _ClockInPageState extends State<ClockInPage> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Text(
-                  goal,
+                  projectTitle,
                   style: TextStyle(fontSize: 16, color: Colors.black87),
+                  softWrap: true,
+                  overflow:
+                      TextOverflow.visible,
+                ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Project Description',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.all(15.0),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Text(
+                  projectDescription,
+                  style: TextStyle(fontSize: 16, color: Colors.black87),
+                  softWrap: true,
+                  overflow:
+                      TextOverflow.visible,
                 ),
               ),
               SizedBox(height: 30),
@@ -214,7 +255,7 @@ class _ClockInPageState extends State<ClockInPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => HomePageAfterClockIn()),
+                                builder: (context) => HomeScreen()),
                           );
                         },
                   child: isLoading

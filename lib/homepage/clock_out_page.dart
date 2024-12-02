@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:worktrack/homepage/finish_page.dart';
+import 'package:worktrack/homepage/home_screen.dart';
 
 void main() {
   runApp(ClockOutApp());
@@ -158,7 +158,7 @@ class _ClockOutPageState extends State<ClockOutPage> {
                   if (_imageFiles != null && _imageFiles!.isNotEmpty) {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => ScreenfinishPage()),
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
                     );
                   } else {
                     // Show error if no image is selected
