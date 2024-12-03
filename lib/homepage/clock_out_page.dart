@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:worktrack/homepage/home_screen.dart';
+import 'package:worktrack/login.dart';
 
 void main() {
   runApp(ClockOutApp());
@@ -13,9 +14,7 @@ class ClockOutApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Clock Out App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: ClockOutPage(),
     );
   }
@@ -27,165 +26,141 @@ class ClockOutPage extends StatefulWidget {
 }
 
 class _ClockOutPageState extends State<ClockOutPage> {
-  final ImagePicker _picker = ImagePicker();
-  List<XFile>? _imageFiles = [];
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  bool isLoading = false;
 
-  // Fungsi untuk memilih gambar dari galeri
-  Future<void> _pickImage() async {
-    final List<XFile>? pickedFiles = await _picker.pickMultiImage();
+  Future<void> _clockOut() async {
+    if (!_validateInput()) return;
 
-    if (pickedFiles != null) {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final dio = Dio();
+      final response = await dio.post(
+        '${urlDomain}api/absence/clockout',
+        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
+        data: {
+          'activity_title': _titleController.text,
+          'activity_description': _descriptionController.text,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      } else {
+        _showError(response.data['message']);
+      }
+    } catch (e) {
+      _showError('Failed to clock out: $e');
+    } finally {
       setState(() {
-        _imageFiles = pickedFiles;
+        isLoading = false;
       });
     }
   }
 
-  // Fungsi untuk memeriksa apakah file gambar valid
-  bool _isValidImage(XFile file) {
-    final String extension = file.name.split('.').last.toLowerCase();
-    return ['jpg', 'jpeg', 'png'].contains(extension);
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  bool _validateInput() {
+    if (_titleController.text.isEmpty) {
+      _showError('Please enter a title for your activity.');
+      return false;
+    }
+    if (_descriptionController.text.isEmpty) {
+      _showError('Please describe your activity.');
+      return false;
+    }
+    return true;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        toolbarHeight: 150,
-        automaticallyImplyLeading: false,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () {
-                Navigator.pop(context); 
-              },
-            ),
-            _buildLiveTimeAndDate(),
-          ],
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          toolbarHeight: 100,
+          automaticallyImplyLeading: false,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.black),
+                onPressed: () => Navigator.pop(context),
+              ),
+              _buildLiveTimeAndDate(),
+            ],
+          ),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Text(
-                'Clock Out',
-                style: TextStyle(color: Colors.black, fontSize: 24, letterSpacing: 4, fontFamily: 'inter', fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(height: 30),
-            Text(
-              'Title of Your Activity Today',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Describe Your Activity Today',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            TextField(
-              maxLines: 4,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Text(
-              'Take a Screenshot of Your Activity (jpg,jpeg,png)',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                height: 120,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(color: Colors.grey),
-                ),
-                child: Center(
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
                   child: Text(
-                    'Select Images',
-                    style: TextStyle(fontSize: 18, color: Colors.black),
+                    'Clock Out',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 4,
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 30),
+                const Text('Title of Your Activity Today', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                TextField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    hintText: 'Enter activity title',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                const Text('Describe Your Activity Today', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                TextField(
+                  controller: _descriptionController,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: 'Enter activity description',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+                  ),
+                ),
+                const SizedBox(height: 30),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 239, 218, 26),
+                      padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: isLoading ? null : _clockOut,
+                    child: isLoading
+                        ? CircularProgressIndicator(color: Colors.white)
+                        : Text('Clock Out', style: TextStyle(color: Colors.white, fontSize: 18)),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            if (_imageFiles != null && _imageFiles!.isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Selected Images:",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  for (var file in _imageFiles!)
-                    if (_isValidImage(file))
-                      Text(file.name)
-                    else
-                      Text('Invalid file format: ${file.name}'),
-                ],
-              ),
-            SizedBox(height: 30),
-            Center(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 239, 218, 26),
-                  padding: EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: () {
-                  // Logic to submit the form
-                  if (_imageFiles != null && _imageFiles!.isNotEmpty) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
-                    );
-                  } else {
-                    // Show error if no image is selected
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Please select an image')),
-                    );
-                  }
-                },
-                child: Text(
-                  'Clock Out',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  String _formatTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
-  }
-
-  String _formatDate(DateTime dateTime) {
-    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
-  }
+  String _formatTime(DateTime dateTime) => DateFormat('HH:mm').format(dateTime);
+  String _formatDate(DateTime dateTime) => DateFormat('EEEE, MMM dd').format(dateTime);
 
   Widget _buildLiveTimeAndDate() {
     return StreamBuilder(
@@ -195,15 +170,9 @@ class _ClockOutPageState extends State<ClockOutPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              _formatTime(now),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Inter'),
-            ),
+            Text(_formatTime(now), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 1),
-            Text(
-              _formatDate(now),
-              style: const TextStyle(fontSize: 12, fontFamily: 'Inter'),
-            ),
+            Text(_formatDate(now), style: const TextStyle(fontSize: 12)),
           ],
         );
       },

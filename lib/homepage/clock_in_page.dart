@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:dio/dio.dart';
 import 'package:worktrack/homepage/home_screen.dart';
 import 'package:worktrack/login.dart';
@@ -30,8 +28,6 @@ class ClockInPage extends StatefulWidget {
 }
 
 class _ClockInPageState extends State<ClockInPage> {
-  String location = "Unknown";
-  String coordinates = "";
   String projectTitle = "Loading...";
   String projectDescription = "Loading...";
   bool isLoading = false;
@@ -72,64 +68,32 @@ class _ClockInPageState extends State<ClockInPage> {
     }
   }
 
-  // Fetch Current Location
-  Future<void> fetchLocationAndSendToAbsence() async {
+  Future<void> clockIn() async {
     try {
-      bool serviceEnabled;
-      LocationPermission permission;
-
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() {
-          location = "Location services are disabled";
-        });
-        return;
-      }
-
-      permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission != LocationPermission.whileInUse &&
-            permission != LocationPermission.always) {
-          setState(() {
-            location = "Permission denied";
-          });
-          return;
-        }
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-
-      setState(() {
-        coordinates = "${position.latitude}, ${position.longitude}";
-      });
-
-      // Reverse geocode coordinates
-      List<Placemark> placemarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      Placemark place = placemarks.first;
-      setState(() {
-        location = "${place.locality}, ${place.country}";
-      });
-
-      // Send location to absence table
       final dio = Dio();
       final response = await dio.post(
-        '${urlDomain}/api/absence/clockin',
-        data: {
-          'location': location,
-          'coordinates': coordinates,
-        },
+        '${urlDomain}api/absence/clockin',
+        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
       );
 
       if (response.statusCode == 200) {
-        print('Location successfully sent: ${response.data}');
+        // Navigasi ke halaman HomeScreen setelah berhasil clock in
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
       } else {
-        print('Failed to send location: ${response.statusCode}');
+        // Menampilkan pesan kesalahan sederhana di UI
+        setState(() {
+          projectDescription =
+              'Failed to clock in: ${response.data['message']}';
+        });
       }
     } catch (e) {
-      print('Error fetching location or sending data: $e');
+      // Menampilkan pesan kesalahan dari pengecualian
+      setState(() {
+        projectDescription = 'An error occurred: $e';
+      });
     }
   }
 
@@ -137,7 +101,6 @@ class _ClockInPageState extends State<ClockInPage> {
   void initState() {
     super.initState();
     fetchGoalData();
-    fetchLocationAndSendToAbsence();
   }
 
   @override
@@ -181,21 +144,6 @@ class _ClockInPageState extends State<ClockInPage> {
               ),
               SizedBox(height: 20),
               Text(
-                'Your Location',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                enabled: false,
-                decoration: InputDecoration(
-                  hintText: location,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Text(
                 'Goal',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
@@ -214,8 +162,7 @@ class _ClockInPageState extends State<ClockInPage> {
                   projectTitle,
                   style: TextStyle(fontSize: 16, color: Colors.black87),
                   softWrap: true,
-                  overflow:
-                      TextOverflow.visible,
+                  overflow: TextOverflow.visible,
                 ),
               ),
               SizedBox(height: 20),
@@ -234,8 +181,7 @@ class _ClockInPageState extends State<ClockInPage> {
                   projectDescription,
                   style: TextStyle(fontSize: 16, color: Colors.black87),
                   softWrap: true,
-                  overflow:
-                      TextOverflow.visible,
+                  overflow: TextOverflow.visible,
                 ),
               ),
               SizedBox(height: 30),
@@ -249,24 +195,12 @@ class _ClockInPageState extends State<ClockInPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: isLoading
-                      ? null
-                      : () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => HomeScreen()),
-                          );
-                        },
-                  child: isLoading
-                      ? CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          'Clock In',
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontFamily: 'inter'),
-                        ),
+                  onPressed: clockIn,
+                  child: Text(
+                    'Clock In',
+                    style: TextStyle(
+                        color: Colors.white, fontSize: 18, fontFamily: 'inter'),
+                  ),
                 ),
               ),
             ],
