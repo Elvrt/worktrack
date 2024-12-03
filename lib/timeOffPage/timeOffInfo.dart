@@ -27,7 +27,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
     fetchRequests(currentPage);
   }
 
-   Future<void> fetchRequests(int page) async {
+  Future<void> fetchRequests(int page) async {
     try {
       // Tambahkan token ke header
       final options = Options(
@@ -54,19 +54,21 @@ class _TimeOffScreenState extends State<timeOffInfo> {
 
         setState(() {
           // Tampilkan hanya data dari halaman saat ini
-          requests = data.map((item) => {
+          requests = data
+              .map((item) => {
                     'no_request': item['time_off_id'].toString(),
                     'workLeave': '${item['start_date']} - ${item['end_date']}',
                     'status': item['status'].toString(),
-                    'employee_id' : item ['employee_id'].toString(),
-                    'employee_name': item['employee']['name'].toString(), // Ambil nama karyawan
-                    'reason' : item['reason'].toString(),
-                    'letter' : item['letter'].toString()
+                    'employee_id': item['employee_id'].toString(),
+                    'employee_name': item['employee']['name']
+                        .toString(), // Ambil nama karyawan
+                    'reason': item['reason'].toString(),
+                    'letter': item['letter'].toString()
                   })
               .toList();
 
           // Perbarui kondisi isLastPage berdasarkan jumlah item di halaman
-          isLastPage = data.length < 4; 
+          isLastPage = data.length < 4;
           print("Is last page: $isLastPage");
         });
       } else {
@@ -77,17 +79,18 @@ class _TimeOffScreenState extends State<timeOffInfo> {
     }
   }
 
-    // Format waktu
+  // Format waktu
   String _formatTime(DateTime dateTime) {
     return DateFormat('HH:mm').format(dateTime); // Format jam:menit
   }
 
   // Format tanggal
   String _formatDate(DateTime dateTime) {
-    return DateFormat('EEEE, MMM dd').format(dateTime); // Contoh: Wednesday, Feb 11
+    return DateFormat('EEEE, MMM dd')
+        .format(dateTime); // Contoh: Wednesday, Feb 11
   }
 
- // model tanggal dan waktu
+  // model tanggal dan waktu
   Widget _buildLiveTimeAndDate() {
     return StreamBuilder(
       stream: Stream.periodic(const Duration(seconds: 1)),
@@ -121,7 +124,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
   void _navigateToTimeOffDetail(Map<String, String> request) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => TimeOffDetail( timeOffRequest: request),
+        builder: (context) => TimeOffDetail(timeOffRequest: request),
       ),
     );
   }
@@ -313,34 +316,34 @@ class _TimeOffScreenState extends State<timeOffInfo> {
                     ),
                   ),
                   const SizedBox(height: 20),
-               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                    onPressed: currentPage > 1 ? _loadPreviousPage : null,
-                    child: const Text('Previous'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: currentPage > 1 ? _loadPreviousPage : null,
+                        child: const Text('Previous'),
+                      ),
+                      ElevatedButton(
+                        onPressed: !isLastPage ? _loadNextPage : null,
+                        child: const Text('Next'),
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    onPressed: !isLastPage ? _loadNextPage : null,
-                    child: const Text('Next'),
-                  ),
-                ],
-              ),
                 ],
               ),
             ),
           ),
-         Positioned(
+          Positioned(
             bottom: 70,
             right: 20,
             child: FloatingActionButton(
-                onPressed: _navigateToTimeOff,
-                backgroundColor: const Color(0xFFF6D647),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(40),
-                ),
-                child: const Icon(Icons.add),
+              onPressed: _navigateToTimeOff,
+              backgroundColor: const Color(0xFFF6D647),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(40),
               ),
+              child: const Icon(Icons.add),
+            ),
           ),
         ],
       ),

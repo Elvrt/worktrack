@@ -5,20 +5,6 @@ import 'package:worktrack/navbar.dart';
 import 'package:intl/intl.dart';
 import 'package:worktrack/login.dart';
 
-class ReportMonthlyApp extends StatelessWidget {
-  const ReportMonthlyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const ReportPage(),
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-    );
-  }
-}
-
 class ReportPage extends StatefulWidget {
   const ReportPage({super.key});
 
@@ -217,25 +203,25 @@ class _ReportPageState extends State<ReportPage> {
                                           report['absence']['clock_out']),
                                     ),
                                   )),
-                                 DataCell(
-  Padding(
-    padding: const EdgeInsets.all(8),
-    child: IconButton(
-      icon: const Icon(Icons.info_outline),
-      iconSize: 24,
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ReportDetail(
-              // reportId: report['id'], // Pass the specific report ID
-            ),
-          ),
-        );
-      },
-    ),
-  ),
-),
+                                  DataCell(
+                                    Padding(
+                                      padding: const EdgeInsets.all(8),
+                                      child: IconButton(
+                                        icon: const Icon(Icons.info_outline),
+                                        iconSize: 24,
+                                        onPressed: () {
+                                          final reportId = report['report_id'];
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ReportDetail(reportId: reportId),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               );
                             }).toList(),
@@ -334,5 +320,4 @@ class _ReportPageState extends State<ReportPage> {
       },
     );
   }
-
 }
