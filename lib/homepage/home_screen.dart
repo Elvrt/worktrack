@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String clockInTime = "";
   String clockOutTime = "";
   Map<String, dynamic>? absence;
+  String goal = "Loading..."; // Add a goal variable to store the fetched goal
 
   @override
   void initState() {
@@ -69,12 +70,17 @@ class _HomeScreenState extends State<HomeScreen> {
           clockOutTime = data['absence']?['clock_out'] ?? "";
 
           absence = data['absence'];
+
+          // Fetch and set the goal
+          goal = data['goal']?['project_title'] ??
+              'No goal set'; // Adjust this based on the structure of the goal object
         });
       } else {
         setState(() {
           employeeName = "Failed to load";
           employeeNumber = "N/A";
           profileImageUrl = "";
+          goal = "Error loading goal";
         });
       }
     } catch (e) {
@@ -82,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
         employeeName = "Error loading profile";
         employeeNumber = "N/A";
         profileImageUrl = "";
+        goal = "Error loading goal";
       });
     }
   }
@@ -166,6 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: kToolbarHeight),
+ 
             _buildProfileSection(),
             SizedBox(height: 10),
             _buildLiveTime(),
@@ -173,11 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildLiveDate(),
             SizedBox(height: 15),
             _buildClockInButton(context),
-            SizedBox(height: 10),
-            Text(
-              'Location: Unknown - Khalid',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
             SizedBox(height: 20),
             _buildActionButtons(),
             SizedBox(height: 20),
@@ -189,7 +192,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProfileSection() {
-    // Ensure name is limited to 10 characters, and add '...' if truncated
     String displayName = employeeName.length > 10
         ? '${employeeName.substring(0, 10)}...'
         : employeeName;
@@ -350,6 +352,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Action Buttons (Clock In, Debug iOS, Clock Out)
   Widget _buildActionButtons() {
+    String goalName = goal.length > 10
+        ? '${goal.substring(0, 10)}...'
+        : goal;
+
     return Column(
       children: [
         Row(
@@ -368,14 +374,17 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(
+              
               width: 100,
               child: Column(
+                
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.local_fire_department,
                       size: 40, color: Colors.yellow),
                   SizedBox(height: 5),
-                  Text('Debug iOS', style: TextStyle(fontSize: 16)),
+                  Text(goalName,
+                      style: TextStyle(fontSize: 16)), // Ganti dengan goal
                 ],
               ),
             ),

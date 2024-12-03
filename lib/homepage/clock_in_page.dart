@@ -106,6 +106,7 @@ class _ClockInPageState extends State<ClockInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Set background color to white
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
