@@ -14,7 +14,15 @@ class ClockOutApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Clock Out App',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        scaffoldBackgroundColor:
+            Colors.white, // Set default background color to white
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white, // Set app bar background to white
+          elevation: 0,
+        ),
+      ),
       home: ClockOutPage(),
     );
   }
@@ -85,9 +93,9 @@ class _ClockOutPageState extends State<ClockOutPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        // Ensure the Scaffold background is white
+        backgroundColor: Colors.white,
         appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
           toolbarHeight: 100,
           automaticallyImplyLeading: false,
           title: Row(
@@ -101,9 +109,9 @@ class _ClockOutPageState extends State<ClockOutPage> {
             ],
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: SingleChildScrollView(
+        body: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -173,7 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(height: kToolbarHeight),
- 
             _buildProfileSection(),
             SizedBox(height: 10),
             _buildLiveTime(),
@@ -352,9 +351,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Action Buttons (Clock In, Debug iOS, Clock Out)
   Widget _buildActionButtons() {
-    String goalName = goal.length > 10
-        ? '${goal.substring(0, 10)}...'
-        : goal;
+    String goalName = goal.length > 10 ? '${goal.substring(0, 10)}...' : goal;
 
     return Column(
       children: [
@@ -374,10 +371,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             SizedBox(
-              
               width: 100,
               child: Column(
-                
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.local_fire_department,
@@ -446,79 +441,115 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   // Event Info Widget
+// Event Info Widget with Hover Effect
   Widget _buildEventInfo() {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
-        color: Colors.grey[200],
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: Offset(0, 3), // Shadow position
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Events',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          // Event Header
+          const Align(
+            alignment: Alignment.topCenter,
+            child: Text(
+              'Event',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
           ),
+          const SizedBox(height: 10), // Space between header and list
+
           events.isNotEmpty
               ? ListView.separated(
-                  shrinkWrap:
-                      true, // Agar ListView tidak memenuhi seluruh layar
-                  physics: NeverScrollableScrollPhysics(), // Non-scrollable
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: events.length,
-                  separatorBuilder: (context, index) => Divider(
-                    color: Colors.grey[400],
-                    thickness: 0.5,
-                  ),
+                  separatorBuilder: (context, index) => SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final event = events[index];
-                    return Row(
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 2,
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Expanded(
-                          flex: 3,
-                          child: Text(
+                          // Date
+                          Text(
                             event['event_date'] ?? '',
-                            style:
-                                TextStyle(fontSize: 16, color: Colors.black87),
-                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        Container(
-                          width: 80,
-                          child: Text(
-                            event['event_time'] ?? '',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black54,
-                              fontWeight: FontWeight.w600,
+                          // Centered Event Time
+                          Expanded(
+                            child: Center(
+                              child: Text(
+                                event['event_time'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black54,
+                                ),
+                              ),
                             ),
-                            textAlign: TextAlign.center,
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 4,
+                          // Event Description
+                          Expanded(
                           child: Text(
                             event['information'] ?? '',
-                            style:
-                                TextStyle(fontSize: 16, color: Colors.black54),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black54,
+                              ),
                             overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                              textAlign: TextAlign.end,
                           ),
                         ),
                       ],
+                      ),
                     );
                   },
                 )
-              : const Text(
+              : const Center(
+                  child: Text(
                   'No events available',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
                 ),
         ],
       ),
     );
   }
+
 
   // Helper to build action columns
   Column _buildActionColumn(IconData icon, String label) {
