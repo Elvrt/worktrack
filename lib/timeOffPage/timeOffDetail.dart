@@ -123,7 +123,7 @@ class TimeOffDetail extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 170),
+                const SizedBox(height: 70),
               ],
             ),
           ),
@@ -133,33 +133,60 @@ class TimeOffDetail extends StatelessWidget {
   }
 
   TableRow _buildTableRow(String key, String? value) {
-    return TableRow(
-      decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+  bool isImage = key == 'Letter' && value != null && value.startsWith('https');
+  return TableRow(
+    decoration: BoxDecoration(
+      color: Colors.grey.shade50,
+    ),
+    children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          key,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            fontFamily: 'Inter',
+          ),
+        ),
       ),
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            key,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              fontFamily: 'Inter',
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Text(
-            value ?? 'N/A',
-            style: const TextStyle(
-              fontSize: 14,
-              fontFamily: 'Inter',
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: isImage
+            ? SizedBox(
+                height: 200, // Tinggi area gambar
+                width: 200,  // Lebar area gambar
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    value!,
+                    fit: BoxFit.contain, // Gambar ditampilkan penuh tanpa terpotong
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  (loadingProgress.expectedTotalBytes ?? 1)
+                              : null,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(child: Text('Failed to load image'));
+                    },
+                  ),
+                ),
+              )
+            : Text(
+                value ?? 'N/A',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontFamily: 'Inter',
+                ),
+              ),
+      ),
+    ],
+  );
+}
 }
