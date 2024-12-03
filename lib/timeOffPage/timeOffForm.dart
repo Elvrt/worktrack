@@ -23,12 +23,11 @@ class _TimeOffScreenState extends State<timeOff> {
   String? errorMessage;
   String? selectedFilePath;
 
-
   // Fungsi untuk mengirim data time off
 Future<void> submitTimeOff() async {
     try {
       final dio = Dio();
-      dio.options.headers["Authorization"] = "Bearer $authToken"; // Tambahkan auth header
+      dio.options.headers["Authorization"] = "Bearer $authToken"; // Auth token
 
       // Data yang akan dikirim
       FormData formData = FormData.fromMap({
@@ -37,16 +36,16 @@ Future<void> submitTimeOff() async {
         'end_date': endDateController.text,
       });
 
-  // Tambahkan file jika ada
-    if (selectedFilePath != null && selectedFilePath!.isNotEmpty) {
-      final file = File(selectedFilePath!); // Gunakan path yang lengkap
-      formData.files.add(MapEntry(
-        'letter',
-        await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
-      ));
-    }  
-    
-     // Kirim data ke API
+      // Tambahkan file jika ada
+      if (selectedFilePath != null && selectedFilePath!.isNotEmpty) {
+        final file = File(selectedFilePath!);
+        formData.files.add(MapEntry(
+          'letter',
+          await MultipartFile.fromFile(file.path, filename: file.path.split('/').last),
+        ));
+      }
+
+      // Kirim data ke API
      final response = await dio.post(
       '${urlDomain}api/timeoff/store/',
       data: formData,
@@ -153,9 +152,9 @@ Future<void> submitTimeOff() async {
                       fontFamily: 'Inter',
                       letterSpacing: 4,
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  _buildInputLabel('Reason', 260),
+                    
+                  ),const SizedBox(height: 30),
+                   _buildInputLabel('Reason', 260),
                   CustomTextField(controller: reasonController),
                   const SizedBox(height: 5),
                   _buildInputLabel('Start Date', 240),
@@ -165,7 +164,15 @@ Future<void> submitTimeOff() async {
                   CustomTextField(controller: endDateController, isDateField: true),
                   const SizedBox(height: 5),
                   _buildInputLabel('Leave Permission Letter (img)', 90),
-                  CustomTextField(controller: fileController, isFileField: true),
+                  CustomTextField(
+                    controller: fileController,
+                    isFileField: true,
+                    selectedFilePath: (filePath) {
+                      setState(() {
+                        selectedFilePath = filePath;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 50),
                 ],
               ),
@@ -193,12 +200,14 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final bool isDateField;
   final bool isFileField;
+  final Function(String)? selectedFilePath;
 
   const CustomTextField({
     super.key,
     required this.controller,
     this.isDateField = false,
     this.isFileField = false,
+    this.selectedFilePath,
   });
 
   Future<void> _selectDate(BuildContext context) async {
@@ -213,14 +222,18 @@ class CustomTextField extends StatelessWidget {
     }
   }
 
-  Future<void> _selectFile() async {
+Future<void> _selectFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'png', 'jpeg'],
     );
     if (result != null) {
+      String filePath = result.files.single.path!;
       String fileName = result.files.single.name;
       controller.text = fileName;
+      if (selectedFilePath != null) {
+        selectedFilePath!(filePath);
+      }
     }
   }
 
