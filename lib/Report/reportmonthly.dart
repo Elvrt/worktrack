@@ -25,7 +25,6 @@ class _ReportPageState extends State<ReportPage> {
     _fetchReports(_currentMonth); // Ambil laporan berdasarkan bulan default
   }
 
-  // Inisialisasi Dio dengan authToken
   void _initializeDio() {
     _dio = Dio(BaseOptions(
       baseUrl: '${urlDomain}api',
@@ -36,7 +35,6 @@ class _ReportPageState extends State<ReportPage> {
     ));
   }
 
-  // Fungsi untuk mengambil data laporan berdasarkan bulan
   Future<void> _fetchReports(String month) async {
     setState(() {
       _isLoading = true;
@@ -64,12 +62,20 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
-  // Fungsi untuk berpindah bulan
-  void _changeMonth(String newMonth) {
+  void _changeMonth(int offset) {
     setState(() {
-      _currentMonth = newMonth;
+      DateTime currentDate = DateTime.parse('$_currentMonth-01');
+      DateTime newDate =
+          DateTime(currentDate.year, currentDate.month + offset);
+      _currentMonth =
+          '${newDate.year}-${newDate.month.toString().padLeft(2, '0')}';
     });
-    _fetchReports(newMonth);
+    _fetchReports(_currentMonth);
+  }
+
+  String _getMonthName(String month) {
+    final date = DateTime.parse('$month-01');
+    return DateFormat('MMMM yyyy').format(date);
   }
 
   @override
@@ -92,7 +98,7 @@ class _ReportPageState extends State<ReportPage> {
           Center(
             child: Text(
               'REPORT',
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 24,
                 letterSpacing: 4,
@@ -101,7 +107,6 @@ class _ReportPageState extends State<ReportPage> {
               ),
             ),
           ),
-          // Header untuk navigasi bulan
           Container(
             width: double.infinity,
             height: 51,
@@ -115,13 +120,12 @@ class _ReportPageState extends State<ReportPage> {
             alignment: Alignment.center,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back_ios_new),
                   color: Colors.black,
                   onPressed: () {
-                    _changeMonth('2024-10'); // Pindah ke bulan Oktober
+                    _changeMonth(-1); // Mundur satu bulan
                   },
                 ),
                 Text(
@@ -132,20 +136,18 @@ class _ReportPageState extends State<ReportPage> {
                     fontSize: 24,
                     fontWeight: FontWeight.w400,
                   ),
-                  textAlign: TextAlign.center,
                 ),
                 IconButton(
                   icon: const Icon(Icons.arrow_forward_ios),
                   color: Colors.black,
                   onPressed: () {
-                    _changeMonth('2024-11'); // Pindah ke bulan Desember
+                    _changeMonth(1); // Maju satu bulan
                   },
                 ),
               ],
             ),
           ),
           const SizedBox(height: 10),
-          // Tabel laporan
           _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _reports.isEmpty
@@ -157,30 +159,10 @@ class _ReportPageState extends State<ReportPage> {
                           scrollDirection: Axis.horizontal,
                           child: DataTable(
                             columns: const [
-                              DataColumn(
-                                label: Text(
-                                  'Date',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Clock In',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Clock Out',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              DataColumn(
-                                label: Text(
-                                  'Detail',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
+                              DataColumn(label: Text('Date')),
+                              DataColumn(label: Text('Clock In')),
+                              DataColumn(label: Text('Clock Out')),
+                              DataColumn(label: Text('Detail')),
                             ],
                             rows: _reports.map((report) {
                               return DataRow(
@@ -219,7 +201,7 @@ class _ReportPageState extends State<ReportPage> {
                                             ),
                                           );
                                         },
-                                      ),
+                                                 ),
                                     ),
                                   ),
                                 ],
@@ -235,14 +217,12 @@ class _ReportPageState extends State<ReportPage> {
     );
   }
 
-  // Format tanggal menjadi 'dd'
   String _formatDate(String? date) {
     if (date == null) return '-';
     final parsedDate = DateTime.parse(date);
     return '${parsedDate.day.toString().padLeft(2, '0')}';
   }
 
-  // Format waktu menjadi 'h:i'
   String _formatTime(String? time) {
     if (time == null) return '-';
     final parts = time.split(':');
@@ -251,13 +231,27 @@ class _ReportPageState extends State<ReportPage> {
     return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   }
 
-  // Fungsi untuk mendapatkan nama bulan dari format YYYY-MM
-  String _getMonthName(String month) {
-    final date = DateTime.parse(month + '-01');
-    return '${date.month == 11 ? "November" : date.month == 12 ? "December" : "October"} ${date.year}';
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              DateFormat('HH:mm').format(now),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              DateFormat('EEEE, MMM dd').format(now),
+              style: const TextStyle(),
+            ),
+          ],
+        );
+      },
+    );
   }
-
-  // Fungsi untuk menentukan warna teks clock_in
   Color _getClockInColor(String? clockIn) {
     if (clockIn == null) return Colors.black;
     final time = TimeOfDay(
@@ -277,47 +271,5 @@ class _ReportPageState extends State<ReportPage> {
       minute: int.parse(clockOut.split(':')[1]),
     );
     return time.hour < 17 ? Colors.red : Colors.green;
-  }
-
-  // model tanggal dan waktu
-  String formatTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
-  }
-
-  // Format tanggal
-  String formatDate(DateTime dateTime) {
-    return DateFormat('EEEE, MMM dd')
-        .format(dateTime); // Contoh: Wednesday, Feb 11
-  }
-
-  // model tanggal dan waktu
-  Widget _buildLiveTimeAndDate() {
-    return StreamBuilder(
-      stream: Stream.periodic(const Duration(seconds: 1)),
-      builder: (context, snapshot) {
-        final now = DateTime.now();
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              formatTime(now),
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Inter',
-              ),
-            ),
-            const SizedBox(height: 1),
-            Text(
-              formatDate(now),
-              style: const TextStyle(
-                fontSize: 12,
-                fontFamily: 'Inter',
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 }
