@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:worktrack/navbar.dart';
 import 'package:worktrack/login.dart';
+import 'package:intl/intl.dart';
 
 class ReportDetail extends StatefulWidget {
   final int reportId; // Menyimpan ID laporan yang diterima dari parameter
@@ -61,64 +62,54 @@ class _ReportDetailState extends State<ReportDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'REPORT',
-          style: TextStyle(
-            fontSize: 30,
-            fontWeight: FontWeight.w500,
-            fontFamily: 'Urbanist',
-          ),
-        ),
-        centerTitle: true,
-        toolbarHeight: 100,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: const [
-                Text(
-                  '17:19',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  'Wednesday, 11 Feb',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
+  return Scaffold(
+    backgroundColor: Colors.white,
+    appBar: AppBar(
+      elevation: 0,
+      surfaceTintColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          _buildLiveTimeAndDate(),
         ],
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _isError
-              ? const Center(child: Text('Failed to load report details'))
-              : _buildReportDetails(),
-      bottomNavigationBar: BottomNavBar(currentIndex: 0),
-    );
-  }
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        color: Colors.black,
+        onPressed: () {
+          Navigator.pop(context);
+        },
+      ),
+    ),
+    body: _isLoading
+        ? const Center(child: CircularProgressIndicator())
+        : _isError
+            ? const Center(child: Text('Failed to load report details'))
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Center(
+                    child: Text(
+                      'REPORT DETAIL',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        letterSpacing: 4,
+                        fontFamily: 'inter',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: _buildReportDetails(),
+                  ),
+                ],
+              ),
+    bottomNavigationBar: BottomNavBar(currentIndex: 0),
+  );
+}
+
 
   // Menampilkan detail laporan
   Widget _buildReportDetails() {
@@ -298,6 +289,48 @@ class _ReportDetailState extends State<ReportDetail> {
           ),
         ),
       ],
+    );
+  }
+
+  // Format waktu
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('HH:mm').format(dateTime); // Format jam:menit
+  }
+
+  // Format tanggal
+  String _formatDate(DateTime dateTime) {
+    return DateFormat('EEEE, MMM dd')
+        .format(dateTime); // Contoh: Wednesday, Feb 11
+  }
+
+  // model tanggal dan waktu
+  Widget _buildLiveTimeAndDate() {
+    return StreamBuilder(
+      stream: Stream.periodic(const Duration(seconds: 1)),
+      builder: (context, snapshot) {
+        final now = DateTime.now();
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              _formatTime(now),
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
+              ),
+            ),
+            const SizedBox(height: 1),
+            Text(
+              _formatDate(now),
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: 'Inter',
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

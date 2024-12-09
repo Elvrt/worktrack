@@ -160,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
   AppBar _buildAppBar() {
     return AppBar(
       elevation: 0,
+      surfaceTintColor: Colors.transparent,
       backgroundColor: Colors.transparent,
     );
   }
