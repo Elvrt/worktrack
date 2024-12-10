@@ -78,6 +78,7 @@ flutter:
     - img/camera.png
     - img/logo.png
     - img/img1.png
+    - img/ashep.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

@@ -192,35 +192,67 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProfileSection() {
+    // Membatasi panjang nama agar tidak melebihi 10 karakter
     String displayName = employeeName.length > 10
         ? '${employeeName.substring(0, 10)}...'
         : employeeName;
 
-    return Row(
+    return Stack(
       children: [
-        CircleAvatar(
-          radius: 20,
-          backgroundImage: profileImageUrl.isNotEmpty
-              ? NetworkImage(profileImageUrl)
-              : AssetImage('img/default_profile.png')
-                  as ImageProvider, // Fallback image
+        // Background image
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Image.asset(
+            'img/ashep.png', // Gambar latar
+            fit: BoxFit.cover,
+            height: 100, // Sesuaikan tinggi
+            width: double.infinity, // Layar penuh
+          ),
         ),
-        SizedBox(width: 10),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              displayName,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Avatar dengan lingkaran kuning
+              Container(
+                padding:
+                    const EdgeInsets.all(2), // Padding untuk bingkai kuning
+                decoration: BoxDecoration(
+                  color: Colors.yellow, // Warna bingkai kuning
+                  shape: BoxShape.circle, // Membentuk lingkaran
+                ),
+                child: CircleAvatar(
+                  radius: 25, // Ukuran radius lingkaran
+                  backgroundImage: profileImageUrl.isNotEmpty
+                      ? NetworkImage(
+                          profileImageUrl) // Jika URL gambar tersedia
+                      : const AssetImage('img/ashep.png')
+                          as ImageProvider, // Gambar fallback
+                ),
               ),
-            ),
-            Text(
-              employeeNumber,
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
+              const SizedBox(width: 10), // Spasi antara avatar dan teks
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start, // Teks rata kiri
+                children: [
+                  Text(
+                    displayName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    employeeNumber,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black54, // Warna teks untuk nomor
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -445,7 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
 // Event Info Widget with Hover Effect
   Widget _buildEventInfo() {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
         color: Colors.white,
@@ -454,15 +486,16 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.grey.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: Offset(0, 3), // Shadow position
+            offset: const Offset(0, 3), // Shadow position
           ),
         ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // Rata kiri untuk konten
         children: [
           // Event Header
           const Align(
-            alignment: Alignment.topCenter,
+            alignment: Alignment.center,
             child: Text(
               'Event',
               style: TextStyle(
@@ -472,19 +505,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 10), // Space between header and list
-
+          const SizedBox(height: 4), // Mengurangi jarak antara header dan list
           events.isNotEmpty
               ? ListView.separated(
+                  padding: EdgeInsets.zero, // Hilangkan padding default
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: events.length,
-                  separatorBuilder: (context, index) => SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 8), // Jarak antar item list
                   itemBuilder: (context, index) {
                     final event = events[index];
                     return Container(
                       padding: const EdgeInsets.symmetric(
-                          vertical: 15, horizontal: 20),
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
@@ -500,16 +536,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                          // Date
+                        children: [
+                          // Event Date
                           Text(
                             event['event_date'] ?? '',
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
+                            ),
                           ),
-                        ),
                           // Centered Event Time
                           Expanded(
                             child: Center(
@@ -525,32 +561,35 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           // Event Description
                           Expanded(
-                          child: Text(
-                            event['information'] ?? '',
+                            child: Text(
+                              event['information'] ?? '',
                               style: const TextStyle(
                                 fontSize: 14,
                                 color: Colors.black54,
                               ),
-                            overflow: TextOverflow.ellipsis,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1, // Batas maksimal satu baris
                               textAlign: TextAlign.end,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
                       ),
                     );
                   },
                 )
               : const Center(
                   child: Text(
-                  'No events available',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
-                ),
+                    'No events available',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
                 ),
         ],
       ),
     );
   }
-
 
   // Helper to build action columns
   Column _buildActionColumn(IconData icon, String label) {
