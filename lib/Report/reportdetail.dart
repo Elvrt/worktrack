@@ -140,7 +140,9 @@ class _ReportDetailState extends State<ReportDetail> {
         const SizedBox(height: 30),
         _buildClockInOut('Clock In', _reportData!['absence']['clock_in']),
         const SizedBox(height: 30),
-        _buildClockInOut('Clock Out', _reportData!['absence']['clock_out']),
+       _buildClockInOut('Clock Out', _reportData!['absence']['clock_out'] ?? '- '),
+        const SizedBox(height: 30),
+        _locationabsence(),
         const SizedBox(height: 30),
         _buildActivity(),
       ],
@@ -211,6 +213,48 @@ class _ReportDetailState extends State<ReportDetail> {
                 fontFamily: 'Urbanist',
                 fontWeight: FontWeight.w400,
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+    Widget _locationabsence() {
+    return Container(
+      width: 353,
+      padding: const EdgeInsets.all(16),
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        shadows: [
+          BoxShadow(
+            color: const Color(0x3F000000),
+            blurRadius: 4,
+            offset: const Offset(0, 4),
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Location',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Urbanist',
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            _reportData!['absence']['location'] ?? 'No Location Found',
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Urbanist',
             ),
           ),
         ],
