@@ -140,36 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: Colors.red),
                   ),
 
-                // Forgot Password & Remember me Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        // Handle forgot password
-                      },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value!;
-                            });
-                          },
-                        ),
-                        Text('Remember me'),
-                      ],
-                    ),
-                  ],
-                ),
                 SizedBox(height: 20),
 
                 // Login Button
