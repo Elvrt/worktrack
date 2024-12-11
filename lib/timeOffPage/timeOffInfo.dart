@@ -156,6 +156,7 @@ class _TimeOffScreenState extends State<timeOffInfo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
           Positioned(
