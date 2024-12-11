@@ -7,6 +7,7 @@ import 'package:worktrack/homepage/clock_out_page.dart';
 import 'package:worktrack/navbar.dart';
 import 'package:worktrack/timeOffPage/timeOffForm.dart';
 import 'package:worktrack/login.dart';
+import 'package:worktrack/homepage/eventDetailPage.dart';
 
 class HomeScreenPage extends StatelessWidget {
   @override
@@ -162,6 +163,15 @@ class _HomeScreenState extends State<HomeScreen> {
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       backgroundColor: Colors.transparent,
+      flexibleSpace: Container(
+        margin: EdgeInsets.only(bottom: 16.0), // Menambahkan margin bawah
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('img/ashep.png'), // Path ke gambar
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
     );
   }
 
@@ -200,15 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Stack(
       children: [
         // Background image
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Image.asset(
-            'img/ashep.png', // Gambar latar
-            fit: BoxFit.cover,
-            height: 100, // Sesuaikan tinggi
-            width: double.infinity, // Layar penuh
-          ),
-        ),
+
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
@@ -486,14 +488,13 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.grey.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 5,
-            offset: const Offset(0, 3), // Shadow position
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Rata kiri untuk konten
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Event Header
           const Align(
             alignment: Alignment.center,
             child: Text(
@@ -505,74 +506,82 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 4), // Mengurangi jarak antara header dan list
+          const SizedBox(height: 4),
           events.isNotEmpty
               ? ListView.separated(
-                  padding: EdgeInsets.zero, // Hilangkan padding default
+                  padding: EdgeInsets.zero,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: events.length,
                   separatorBuilder: (context, index) =>
-                      const SizedBox(height: 8), // Jarak antar item list
+                      const SizedBox(height: 8),
                   itemBuilder: (context, index) {
                     final event = events[index];
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 2,
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
+                    return GestureDetector(
+                      onTap: () {
+                        // Navigate to event detail page
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventDetailPage(event: event),
                           ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Event Date
-                          Text(
-                            event['event_date'] ?? '',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                          ),
-                          // Centered Event Time
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                event['event_time'] ?? '',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black54,
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              event['event_date'] ?? '',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  event['event_time'] ?? '',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black54,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          // Event Description
-                          Expanded(
-                            child: Text(
-                              event['information'] ?? '',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black54,
+                            Expanded(
+                              child: Text(
+                                event['information'] ?? '',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black54,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                textAlign: TextAlign.end,
                               ),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1, // Batas maksimal satu baris
-                              textAlign: TextAlign.end,
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   },
