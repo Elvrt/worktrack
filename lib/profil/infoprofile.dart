@@ -4,6 +4,7 @@ import 'package:worktrack/profil/editprofile.dart';
 import 'package:worktrack/navbar.dart';
 import 'package:worktrack/login.dart';
 
+
 class InfoProfile extends StatefulWidget {
   @override
   _InfoProfileState createState() => _InfoProfileState();
@@ -26,10 +27,10 @@ class _InfoProfileState extends State<InfoProfile> {
     try {
       final dio = Dio();
       final response = await dio.get(
-        '${urlDomain}api/employee/show', // Ganti dengan endpoint API Anda
+        '${urlDomain}api/employee/show',
         options: Options(
           headers: {
-            'Authorization': 'Bearer $authToken', // Kirim token di header
+            'Authorization': 'Bearer $authToken',
           },
         ),
       );
@@ -51,6 +52,40 @@ class _InfoProfileState extends State<InfoProfile> {
           errorMessage = "Failed to fetch profile data.";
         });
       }
+    } on DioError catch (e) {
+      setState(() {
+        errorMessage =
+            e.response?.data['message'] ?? "An unexpected error occurred.";
+      });
+    }
+  }
+
+  // Fungsi untuk logout
+  Future<void> logout() async {
+    try {
+      final dio = Dio();
+      final response = await dio.post(
+        '${urlDomain}api/logout',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $authToken',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+  // Navigasi ke halaman home_screen setelah logout berhasil
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (context) => LoginScreen()),
+    (route) => false,
+  );
+} else {
+  setState(() {
+    errorMessage = "Logout failed.";
+  });
+}
+
     } on DioError catch (e) {
       setState(() {
         errorMessage =
@@ -145,6 +180,17 @@ class _InfoProfileState extends State<InfoProfile> {
                         ),
                       ),
                       SizedBox(width: 20),
+                      ElevatedButton(
+                        onPressed: logout,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          fixedSize: Size(174, 40),
+                        ),
+                        child: Text(
+                          'Logout',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
                     ],
                   ),
                 ],
