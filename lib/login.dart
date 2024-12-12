@@ -72,94 +72,96 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                Image.asset(
-                  'img/logo.png',
-                  height: 120,
-                ),
-                SizedBox(height: 10),
-
-                // Login Title
-                Text(
-                  'Login',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w500,
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo
+                  Image.asset(
+                    'img/logo.png',
+                    height: 120,
                   ),
-                ),
-                SizedBox(height: 10),
+                  SizedBox(height: 10),
 
-                // Subtitle
-                Text(
-                  'Login to continue using the app',
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
-                ),
-                SizedBox(height: 30),
-
-                // Username TextField
-                TextField(
-                  controller: usernameController,
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-
-                // Password TextField
-                TextField(
-                  controller: passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 10),
-
-                // Error Message
-                if (errorMessage != null)
+                  // Login Title
                   Text(
-                    errorMessage!,
-                    style: TextStyle(color: Colors.red),
-                  ),
-
-                SizedBox(height: 20),
-
-                // Login Button
-                ElevatedButton(
-                  onPressed: login,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.yellow[700],
-                    foregroundColor: Colors.white,
-                    minimumSize: Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    'Login',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  child: Text(
-                    'Login',
-                    style: TextStyle(fontSize: 18),
+                  SizedBox(height: 10),
+
+                  // Subtitle
+                  Text(
+                    'Login to continue using the app',
+                    textAlign: TextAlign.left,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
                   ),
-                ),
-                SizedBox(height: 20),
-              ],
+                  SizedBox(height: 30),
+
+                  // Username TextField
+                  TextField(
+                    controller: usernameController,
+                    decoration: InputDecoration(
+                      labelText: 'Username',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // Password TextField
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: 'Password',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+
+                  // Error Message
+                  if (errorMessage != null)
+                    Text(
+                      errorMessage!,
+                      style: TextStyle(color: Colors.red),
+                    ),
+
+                  SizedBox(height: 20),
+
+                  // Login Button
+                  ElevatedButton(
+                    onPressed: login,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow[700],
+                      foregroundColor: Colors.white,
+                      minimumSize: Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ),
