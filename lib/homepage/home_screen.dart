@@ -309,8 +309,8 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           },
           child: Container(
-            width: 148,
-            height: 148,
+            width: 162,
+            height: 162,
             decoration: BoxDecoration(
               gradient: RadialGradient(
                 colors: absence == null
@@ -370,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
             child: CircleAvatar(
-              radius: 22,
+              radius: 25,
               backgroundColor: Colors.grey,
               child: const Text(
                 'Take Time Off',
