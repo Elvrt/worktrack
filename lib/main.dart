@@ -31,7 +31,7 @@ class HomeScreen extends StatelessWidget {
                 height: 260,
               ),
             ),
-            Padding(
+            Padding( 
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: Align(
                 alignment: Alignment.topLeft,
