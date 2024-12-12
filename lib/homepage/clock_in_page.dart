@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
 import 'package:worktrack/homepage/home_screen.dart';
 import 'package:worktrack/login.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 void main() {
   runApp(ClockInApp());
@@ -30,6 +32,8 @@ class ClockInPage extends StatefulWidget {
 class _ClockInPageState extends State<ClockInPage> {
   String projectTitle = "Loading...";
   String projectDescription = "Loading...";
+  String locationDescription =
+      " + Click to get Location"; // Initial text for location
   bool isLoading = false;
 
   // Fetch Goal Data
@@ -37,17 +41,17 @@ class _ClockInPageState extends State<ClockInPage> {
     try {
       final dio = Dio();
       final response = await dio.get(
-        '${urlDomain}api/absence/goal',
+        '${urlDomain}api/absence/goal', // Replace with your actual API endpoint
         options: Options(
           headers: {
-            'Authorization': 'Bearer $authToken',
+            'Authorization':
+                'Bearer $authToken', // Replace with your valid token
           },
         ),
       );
 
       if (response.statusCode == 200) {
         final data = response.data;
-
         setState(() {
           projectTitle =
               data['data']['goal']['project_title'] ?? 'No Project Title Found';
@@ -68,31 +72,112 @@ class _ClockInPageState extends State<ClockInPage> {
     }
   }
 
+  // Request location permission
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.requestPermission();
+
+    if (permission == LocationPermission.denied) {
+      setState(() {
+        locationDescription = 'Location permission denied.';
+      });
+    } else if (permission == LocationPermission.deniedForever) {
+      setState(() {
+        locationDescription =
+            'Location permission permanently denied. Please enable it in app settings.';
+      });
+    } else {
+      // Permission granted, proceed with fetching location
+      _getCurrentLocation();
+    }
+  }
+
+  // Get current location
+  Future<Position> _getCurrentLocation() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (!serviceEnabled || permission == LocationPermission.denied) {
+      await _requestLocationPermission();
+      return Future.error(
+          'Location service is not enabled or permission denied');
+    }
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      return position;
+    } catch (e) {
+      return Future.error('Failed to get location: $e');
+    }
+  }
+
+  // Get address from coordinates
+  Future<String> _getAddressFromCoordinates(Position position) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark place = placemarks[0];
+      return '${place.locality}, ${place.country}';
+    } catch (e) {
+      return 'Failed to get address: $e';
+    }
+  }
+
+  // Clock In with location and address
   Future<void> clockIn() async {
     try {
+      setState(() {
+        isLoading = true;
+      });
+
+      // Get user's current location
+      Position position = await _getCurrentLocation();
+
+      // Get the address of the current location
+      String address = await _getAddressFromCoordinates(position);
+
+      // Update project description with location info
+      setState(() {
+        projectDescription = 'Location: $address';
+        locationDescription = address; // Update location description
+      });
+
       final dio = Dio();
       final response = await dio.post(
-        '${urlDomain}api/absence/clockin',
+        '${urlDomain}api/absence/clockin', // Ensure this matches the correct endpoint
         options: Options(headers: {'Authorization': 'Bearer $authToken'}),
+        data: {
+          'latitude': position.latitude,
+          'longitude': position.longitude,
+          'address': address, // Include the address in the request
+        },
       );
 
       if (response.statusCode == 200) {
-        // Navigasi ke halaman HomeScreen setelah berhasil clock in
+        // Successfully clocked in
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       } else {
-        // Menampilkan pesan kesalahan sederhana di UI
+        // Handle failure scenario
         setState(() {
           projectDescription =
               'Failed to clock in: ${response.data['message']}';
         });
       }
     } catch (e) {
-      // Menampilkan pesan kesalahan dari pengecualian
+      // Handle any errors that occur during the clock-in process
       setState(() {
         projectDescription = 'An error occurred: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
       });
     }
   }
@@ -186,6 +271,34 @@ class _ClockInPageState extends State<ClockInPage> {
                 ),
               ),
               SizedBox(height: 30),
+              Text(
+                'Location',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  Position position = await _getCurrentLocation();
+                  String address = await _getAddressFromCoordinates(position);
+                  setState(() {
+                    locationDescription =
+                        address; // Update location when clicked
+                  });
+                },
+                child: Container(
+                  padding: EdgeInsets.all(15.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Text(
+                    locationDescription,
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ),
+              SizedBox(height: 30),
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -196,9 +309,9 @@ class _ClockInPageState extends State<ClockInPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: clockIn,
+                  onPressed: isLoading ? null : clockIn,
                   child: Text(
-                    'Clock In',
+                    isLoading ? 'Clocking In...' : 'Clock In',
                     style: TextStyle(
                         color: Colors.white, fontSize: 18, fontFamily: 'inter'),
                   ),

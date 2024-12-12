@@ -241,11 +241,11 @@ class _ReportPageState extends State<ReportPage> {
           children: [
             Text(
               DateFormat('HH:mm').format(now),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             Text(
               DateFormat('EEEE, MMM dd').format(now),
-              style: const TextStyle(),
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         );

@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:worktrack/homepage/home_screen.dart'; // Pastikan HomeScreenPage diimport
 
 // URL konfigurasi
-String urlDomain = "http://192.168.0.11:8000/";
+String urlDomain = "http://103.161.185.246:8000/";
 String urlLogin = "${urlDomain}api/login";
 
 // Global variable for the token
@@ -140,36 +140,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(color: Colors.red),
                   ),
 
-                // Forgot Password & Remember me Row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        // Handle forgot password
-                      },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Checkbox(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value!;
-                            });
-                          },
-                        ),
-                        Text('Remember me'),
-                      ],
-                    ),
-                  ],
-                ),
                 SizedBox(height: 20),
 
                 // Login Button
