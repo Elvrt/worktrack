@@ -5,28 +5,16 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
+import 'package:worktrack/homepage/home_screen.dart';
 import 'package:worktrack/login.dart';
 import 'dart:async';
 import 'package:dio/dio.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Fetch the available cameras before initializing the app
-  final cameras = await availableCameras();
-  final frontCamera = cameras.firstWhere(
-    (camera) => camera.lensDirection == CameraLensDirection.front,
-    orElse: () =>
-        cameras.first, // Default to first camera if front is not available
-  );
-
-  runApp(FaceVerificationApp(camera: frontCamera));
-}
-
 class FaceVerificationApp extends StatelessWidget {
   final CameraDescription camera;
+  final String address;
 
-  FaceVerificationApp({required this.camera});
+  FaceVerificationApp({required this.camera, required this.address});
 
   @override
   Widget build(BuildContext context) {
@@ -35,27 +23,16 @@ class FaceVerificationApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FaceVerificationScreen(camera: camera),
+      home: FaceVerificationScreen(camera: camera, address: address),
     );
   }
 }
 
-Future<void> fetchProfile() async {
-  final dio = Dio();
-  final response = await dio.get(
-    '${urlDomain}api/employee/show',
-    options: Options(
-      headers: {
-        'Authorization': 'Bearer $authToken',
-      },
-    ),
-  );
-}
-
 class FaceVerificationScreen extends StatefulWidget {
   final CameraDescription camera;
+  final String address;
 
-  FaceVerificationScreen({required this.camera});
+  FaceVerificationScreen({required this.camera, required this.address});
 
   @override
   _FaceVerificationScreenState createState() => _FaceVerificationScreenState();
@@ -99,6 +76,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
     });
 
     usernameController = TextEditingController();
+    fetchProfile();
   }
 
   @override
@@ -146,6 +124,15 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
             : "Verification failed! Detected person is $personName.";
         isLoading = false;
       });
+
+      if (isMatch) {
+        await Future.delayed(Duration(seconds: 4)); // Show success message briefly
+        await clockIn(widget.address);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
     } catch (e) {
       print("Error capturing and sending image: $e");
       setState(() {
@@ -157,7 +144,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<Map<String, dynamic>> _sendImageToAPI(File imageFile) async {
     final uri = Uri.parse(
-        "http://192.168.1.21:80/recognize/"); // Android Emulator address
+        "http://192.168.100.67:80/recognize/"); // Android Emulator address
     final request = http.MultipartRequest("POST", uri);
 
     // Add the image file to the request
@@ -170,6 +157,39 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
     // Decode the JSON response
     return jsonDecode(responseBody) as Map<String, dynamic>;
+  }
+
+  Future<void> clockIn(String address) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final dio = Dio();
+      final response = await dio.post(
+        '${urlDomain}api/absence/clockin',
+        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
+        data: {
+          'address': address,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print("Clock-in successful");
+      } else {
+        setState(() {
+          resultMessage = 'Failed to clock in: ${response.data['message']}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        resultMessage = 'An error occurred: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override

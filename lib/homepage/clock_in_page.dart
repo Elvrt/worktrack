@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:dio/dio.dart';
-import 'package:worktrack/homepage/home_screen.dart';
 import 'package:worktrack/login.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
@@ -132,72 +131,22 @@ class _ClockInPageState extends State<ClockInPage> {
   }
 
   // Navigate to Face Recognition Screen
-  Future<void> navigateToFaceRecognition(Position position, String address) async {
-// Fetch the available cameras before initializing the app
-  final cameras = await availableCameras();
-  final frontCamera = cameras.firstWhere(
-    (camera) => camera.lensDirection == CameraLensDirection.front,
-    orElse: () =>
-        cameras.first, // Default to first camera if front is not available
-  );
+  Future<void> navigateToFaceRecognition(
+      Position position, String address) async {
+
+    final cameras = await availableCameras();
+    final frontCamera = cameras.firstWhere(
+      (camera) => camera.lensDirection == CameraLensDirection.front,
+      orElse: () =>
+          cameras.first,
+    );
 
     final isVerified = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FaceVerificationApp(camera: frontCamera),
+        builder: (context) => FaceVerificationApp(camera: frontCamera, address: address),
       ),
     );
-
-    if (isVerified == true) {
-      clockIn(position, address);
-    } else {
-      setState(() {
-        projectDescription = 'Face verification failed.';
-      });
-    }
-  }
-
-  // Clock In with location and address
-  Future<void> clockIn(Position position, String address) async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
-
-      final dio = Dio();
-      final response = await dio.post(
-        '${urlDomain}api/absence/clockin', // Ensure this matches the correct endpoint
-        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
-        data: {
-          'latitude': position.latitude,
-          'longitude': position.longitude,
-          'address': address, // Include the address in the request
-        },
-      );
-
-      if (response.statusCode == 200) {
-        // Successfully clocked in
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } else {
-        // Handle failure scenario
-        setState(() {
-          projectDescription =
-              'Failed to clock in: ${response.data['message']}';
-        });
-      }
-    } catch (e) {
-      // Handle any errors that occur during the clock-in process
-      setState(() {
-        projectDescription = 'An error occurred: $e';
-      });
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
   }
 
   @override
@@ -338,9 +287,10 @@ class _ClockInPageState extends State<ClockInPage> {
                       : () async {
                           try {
                             Position position = await _getCurrentLocation();
-                            String address = await _getAddressFromCoordinates(position);
+                            String address =
+                                await _getAddressFromCoordinates(position);
                             await navigateToFaceRecognition(position, address);
-                                                   } catch (e) {
+                          } catch (e) {
                             setState(() {
                               projectDescription = 'Error occurred: $e';
                             });
