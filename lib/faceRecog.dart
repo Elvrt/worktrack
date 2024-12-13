@@ -16,8 +16,7 @@ void main() async {
   final cameras = await availableCameras();
   final frontCamera = cameras.firstWhere(
     (camera) => camera.lensDirection == CameraLensDirection.front,
-    orElse: () =>
-        cameras.first, // Default to first camera if front is not available
+    orElse: () => cameras.first, // Default to the first camera if no front camera
   );
 
   runApp(FaceVerificationApp(camera: frontCamera));
@@ -35,7 +34,7 @@ class FaceVerificationApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FaceVerificationScreen(camera: camera),
+      home: FaceVerificationScreen(camera: camera), // Pass the camera here
     );
   }
 }
@@ -99,6 +98,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
     });
 
     usernameController = TextEditingController();
+    fetchProfile();
   }
 
   @override
@@ -137,13 +137,12 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
       // Validate the response with username
       final personName = response["person_name"];
-      final isMatch =
-          personName != null && personName == usernameController.text;
+      final isMatch =personName.trim().toLowerCase() == usernameController.text.trim().toLowerCase();
 
       setState(() {
         resultMessage = isMatch
             ? "Verification successful! Welcome, $personName."
-            : "Verification failed! Detected person is $personName.";
+            : "Verification failed! Try Again!";
         isLoading = false;
       });
     } catch (e) {
@@ -157,7 +156,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<Map<String, dynamic>> _sendImageToAPI(File imageFile) async {
     final uri = Uri.parse(
-        "http://192.168.1.21:80/recognize/"); // Android Emulator address
+        "http://192.168.1.16:80/recognize/"); // Android Emulator address
     final request = http.MultipartRequest("POST", uri);
 
     // Add the image file to the request
