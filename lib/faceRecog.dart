@@ -121,7 +121,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       setState(() {
         resultMessage = isMatch
             ? "Verification successful! Welcome, $personName."
-            : "Verification failed! Detected person is $personName.";
+            : "Verification failed! Try Again.";
         isLoading = false;
       });
 
@@ -144,7 +144,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<Map<String, dynamic>> _sendImageToAPI(File imageFile) async {
     final uri = Uri.parse(
-        "http://192.168.100.67:80/recognize/"); // Android Emulator address
+        "http://192.168.56.1:80/recognize/"); // Android Emulator address
     final request = http.MultipartRequest("POST", uri);
 
     // Add the image file to the request
@@ -202,7 +202,10 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.of(context).pop();
+          Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomeScreenPage()),
+                );
           },
         ),
         title: Text(
