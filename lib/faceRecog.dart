@@ -5,6 +5,9 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:path_provider/path_provider.dart';
 import 'package:image/image.dart' as img;
+import 'package:worktrack/login.dart';
+import 'dart:async';
+import 'package:dio/dio.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +16,8 @@ void main() async {
   final cameras = await availableCameras();
   final frontCamera = cameras.firstWhere(
     (camera) => camera.lensDirection == CameraLensDirection.front,
-    orElse: () => cameras.first, // Default to first camera if front is not available
+    orElse: () =>
+        cameras.first, // Default to first camera if front is not available
   );
 
   runApp(FaceVerificationApp(camera: frontCamera));
@@ -36,6 +40,18 @@ class FaceVerificationApp extends StatelessWidget {
   }
 }
 
+Future<void> fetchProfile() async {
+  final dio = Dio();
+  final response = await dio.get(
+    '${urlDomain}api/employee/show',
+    options: Options(
+      headers: {
+        'Authorization': 'Bearer $authToken',
+      },
+    ),
+  );
+}
+
 class FaceVerificationScreen extends StatefulWidget {
   final CameraDescription camera;
 
@@ -50,6 +66,24 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
   late Future<void> _initializeControllerFuture;
   bool isLoading = false;
   String? resultMessage;
+  late TextEditingController usernameController;
+
+  Future<void> fetchProfile() async {
+    final dio = Dio();
+    final response = await dio.get(
+      '${urlDomain}api/employee/show',
+      options: Options(
+        headers: {
+          'Authorization': 'Bearer $authToken',
+        },
+      ),
+    );
+
+    final data = response.data['data'];
+    setState(() {
+      usernameController.text = data['user']['username'] ?? '';
+    });
+  }
 
   @override
   void initState() {
@@ -63,6 +97,8 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
     _initializeControllerFuture = _controller.initialize().catchError((error) {
       print("Camera initialization error: $error");
     });
+
+    usernameController = TextEditingController();
   }
 
   @override
@@ -72,54 +108,61 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
     super.dispose();
   }
 
-  
   Future<void> _captureAndSendImage() async {
-  try {
-    setState(() {
-      isLoading = true;
-      resultMessage = null;
-    });
+    try {
+      setState(() {
+        isLoading = true;
+        resultMessage = null;
+      });
 
-    await _initializeControllerFuture;
+      await _initializeControllerFuture;
 
-    // Capture the image
-    final image = await _controller.takePicture();
+      // Capture the image
+      final image = await _controller.takePicture();
 
-    // Load the captured image
-    final imageBytes = await File(image.path).readAsBytes();
-    img.Image originalImage = img.decodeImage(imageBytes)!;
+      // Load the captured image
+      final imageBytes = await File(image.path).readAsBytes();
+      img.Image originalImage = img.decodeImage(imageBytes)!;
 
-    // Rotate the image by -90 degrees (to fix the orientation)
-    img.Image fixedImage = img.copyRotate(originalImage, angle: 360);
+      // Rotate the image by -90 degrees (to fix the orientation)
+      img.Image fixedImage = img.copyRotate(originalImage, angle: 360);
 
-    // Save the rotated image to a temporary file
-    final tempDir = await getTemporaryDirectory();
-    final fixedImagePath = '${tempDir.path}/fixed_captured_image.jpg';
-    await File(fixedImagePath).writeAsBytes(img.encodeJpg(fixedImage));
+      // Save the rotated image to a temporary file
+      final tempDir = await getTemporaryDirectory();
+      final fixedImagePath = '${tempDir.path}/fixed_captured_image.jpg';
+      await File(fixedImagePath).writeAsBytes(img.encodeJpg(fixedImage));
 
-    // Send the fixed image to the API
-    final response = await _sendImageToAPI(File(fixedImagePath));
+      // Send the fixed image to the API
+      final response = await _sendImageToAPI(File(fixedImagePath));
 
-    // Handle the API response
-    setState(() {
-      resultMessage = response["message"];
-      isLoading = false;
-    });
-  } catch (e) {
-    print("Error capturing and sending image: $e");
-    setState(() {
-      resultMessage = "Error capturing or sending image.";
-      isLoading = false;
-    });
+      // Validate the response with username
+      final personName = response["person_name"];
+      final isMatch =
+          personName != null && personName == usernameController.text;
+
+      setState(() {
+        resultMessage = isMatch
+            ? "Verification successful! Welcome, $personName."
+            : "Verification failed! Detected person is $personName.";
+        isLoading = false;
+      });
+    } catch (e) {
+      print("Error capturing and sending image: $e");
+      setState(() {
+        resultMessage = "Error capturing or sending image.";
+        isLoading = false;
+      });
+    }
   }
-}
 
   Future<Map<String, dynamic>> _sendImageToAPI(File imageFile) async {
-    final uri = Uri.parse("http://192.168.56.1:80/recognize/"); // Android Emulator address
+    final uri = Uri.parse(
+        "http://192.168.1.21:80/recognize/"); // Android Emulator address
     final request = http.MultipartRequest("POST", uri);
 
     // Add the image file to the request
-    request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+    request.files
+        .add(await http.MultipartFile.fromPath('file', imageFile.path));
 
     // Send the request
     final response = await request.send();

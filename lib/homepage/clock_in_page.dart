@@ -5,8 +5,12 @@ import 'package:worktrack/homepage/home_screen.dart';
 import 'package:worktrack/login.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:worktrack/faceRecog.dart';
+import 'package:camera/camera.dart';
+import 'dart:async';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(ClockInApp());
 }
 
@@ -127,23 +131,37 @@ class _ClockInPageState extends State<ClockInPage> {
     }
   }
 
+  // Navigate to Face Recognition Screen
+  Future<void> navigateToFaceRecognition(Position position, String address) async {
+// Fetch the available cameras before initializing the app
+  final cameras = await availableCameras();
+  final frontCamera = cameras.firstWhere(
+    (camera) => camera.lensDirection == CameraLensDirection.front,
+    orElse: () =>
+        cameras.first, // Default to first camera if front is not available
+  );
+
+    final isVerified = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FaceVerificationApp(camera: frontCamera),
+      ),
+    );
+
+    if (isVerified == true) {
+      clockIn(position, address);
+    } else {
+      setState(() {
+        projectDescription = 'Face verification failed.';
+      });
+    }
+  }
+
   // Clock In with location and address
-  Future<void> clockIn() async {
+  Future<void> clockIn(Position position, String address) async {
     try {
       setState(() {
         isLoading = true;
-      });
-
-      // Get user's current location
-      Position position = await _getCurrentLocation();
-
-      // Get the address of the current location
-      String address = await _getAddressFromCoordinates(position);
-
-      // Update project description with location info
-      setState(() {
-        projectDescription = 'Location: $address';
-        locationDescription = address; // Update location description
       });
 
       final dio = Dio();
@@ -277,12 +295,18 @@ class _ClockInPageState extends State<ClockInPage> {
               ),
               GestureDetector(
                 onTap: () async {
-                  Position position = await _getCurrentLocation();
-                  String address = await _getAddressFromCoordinates(position);
-                  setState(() {
-                    locationDescription =
-                        address; // Update location when clicked
-                  });
+                  try {
+                    Position position = await _getCurrentLocation();
+                    String address = await _getAddressFromCoordinates(position);
+                    setState(() {
+                      locationDescription =
+                          address; // Update location when clicked
+                    });
+                  } catch (e) {
+                    setState(() {
+                      locationDescription = 'Error getting location.';
+                    });
+                  }
                 },
                 child: Container(
                   padding: EdgeInsets.all(15.0),
@@ -309,14 +333,34 @@ class _ClockInPageState extends State<ClockInPage> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: isLoading ? null : clockIn,
-                  child: Text(
-                    isLoading ? 'Clocking In...' : 'Clock In',
-                    style: TextStyle(
-                        color: Colors.white, fontSize: 18, fontFamily: 'inter'),
-                  ),
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          try {
+                            Position position = await _getCurrentLocation();
+                            String address = await _getAddressFromCoordinates(position);
+                            await navigateToFaceRecognition(position, address);
+                                                   } catch (e) {
+                            setState(() {
+                              projectDescription = 'Error occurred: $e';
+                            });
+                          }
+                        },
+                  child: isLoading
+                      ? CircularProgressIndicator(
+                          color: Colors.white,
+                        )
+                      : Text(
+                          'Clock In',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
                 ),
               ),
+              SizedBox(height: 30),
             ],
           ),
         ),
@@ -324,36 +368,33 @@ class _ClockInPageState extends State<ClockInPage> {
     );
   }
 
-  String _formatTime(DateTime dateTime) {
-    return DateFormat('HH:mm').format(dateTime);
-  }
-
-  String _formatDate(DateTime dateTime) {
-    return DateFormat('EEEE, MMM dd').format(dateTime);
-  }
-
+  // Build live time and date widget
   Widget _buildLiveTimeAndDate() {
-    return StreamBuilder(
-      stream: Stream.periodic(const Duration(seconds: 1)),
+    return StreamBuilder<DateTime>(
+      stream: Stream.periodic(Duration(seconds: 1), (_) => DateTime.now()),
       builder: (context, snapshot) {
-        final now = DateTime.now();
+        if (!snapshot.hasData) return SizedBox.shrink();
+
+        final now = snapshot.data!;
+        final time = DateFormat('hh:mm:ss a').format(now);
+        final date = DateFormat('EEEE, dd MMM yyyy').format(now);
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(
-              _formatTime(now),
-              style: const TextStyle(
+              time,
+              style: TextStyle(
+                color: Colors.black,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                fontFamily: 'Inter',
               ),
             ),
-            const SizedBox(height: 1),
             Text(
-              _formatDate(now),
-              style: const TextStyle(
-                fontSize: 12,
-                fontFamily: 'Inter',
+              date,
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
               ),
             ),
           ],
