@@ -10,20 +10,6 @@ import 'package:worktrack/login.dart';
 import 'dart:async';
 import 'package:dio/dio.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  // Fetch the available cameras before initializing the app
-  final cameras = await availableCameras();
-  final frontCamera = cameras.firstWhere(
-    (camera) => camera.lensDirection == CameraLensDirection.front,
-    orElse: () =>
-        cameras.first, // Default to first camera if front is not available
-  );
-
-  runApp(FaceVerificationApp(camera: frontCamera));
-}
-
 class FaceVerificationApp extends StatelessWidget {
   final CameraDescription camera;
   final String address;
@@ -37,7 +23,7 @@ class FaceVerificationApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: FaceVerificationScreen(camera: camera),
+      home: FaceVerificationScreen(camera: camera, address: address),
     );
   }
 }
@@ -129,12 +115,13 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
       // Validate the response with username
       final personName = response["person_name"];
-      final isMatch =personName.trim().toLowerCase() == usernameController.text.trim().toLowerCase();
+      final isMatch =
+          personName != null && personName == usernameController.text;
 
       setState(() {
         resultMessage = isMatch
             ? "Verification successful! Welcome, $personName."
-            : "Verification failed! Try Again!";
+            : "Verification failed! Detected person is $personName.";
         isLoading = false;
       });
 
@@ -157,7 +144,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<Map<String, dynamic>> _sendImageToAPI(File imageFile) async {
     final uri = Uri.parse(
-        "http://192.168.1.21:80/recognize/"); // Android Emulator address
+        "http://192.168.100.67:80/recognize/"); // Android Emulator address
     final request = http.MultipartRequest("POST", uri);
 
     // Add the image file to the request
