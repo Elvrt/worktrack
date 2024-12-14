@@ -187,12 +187,6 @@ PreferredSize _buildAppBar() {
       backgroundColor: Colors.transparent,
       flexibleSpace: Container(
         margin: EdgeInsets.only(bottom: 0), // Mengurangi margin bawah
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(''), // Path ke gambar
-            fit: BoxFit.cover,
-          ),
-        ),
       ),
     ),
   );
