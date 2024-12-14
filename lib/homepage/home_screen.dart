@@ -148,32 +148,56 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      extendBodyBehindAppBar: true,
-      appBar: _buildAppBar(),
-      body: _buildBody(context),
-      bottomNavigationBar: BottomNavBar(currentIndex: 1),
-    );
-  }
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    extendBodyBehindAppBar: true, // Memastikan body meluas di belakang AppBar
+    body: Stack(
+      children: [
+        // Gambar sebagai latar belakang AppBar
+        Positioned(
+          top: 0,
+          left: 0,
+          child: Image.asset(
+            'img/ashep.png', // Path ke gambar
+            width: null, // Menyesuaikan lebar dengan ukuran asli
+            height: null, // Menyesuaikan tinggi dengan ukuran asli
+          ),
+        ),
+        // Konten utama
+        Column(
+          children: [
+            _buildAppBar(),
+            // Konten di bawah AppBar
+            Expanded(child: _buildBody(context)),
+          ],
+        ),
+      ],
+    ),
+    bottomNavigationBar: BottomNavBar(currentIndex: 1),
+  );
+}
 
-  AppBar _buildAppBar() {
-    return AppBar(
+PreferredSize _buildAppBar() {
+  return PreferredSize(
+    preferredSize: Size.fromHeight(0), // Mengurangi tinggi AppBar
+    child: AppBar(
       elevation: 0,
       surfaceTintColor: Colors.transparent,
       backgroundColor: Colors.transparent,
       flexibleSpace: Container(
-        margin: EdgeInsets.only(bottom: 16.0), // Menambahkan margin bawah
+        margin: EdgeInsets.only(bottom: 0), // Mengurangi margin bawah
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage('img/ashep.png'), // Path ke gambar
+            image: AssetImage(''), // Path ke gambar
             fit: BoxFit.cover,
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildBody(BuildContext context) {
     return SingleChildScrollView(
@@ -229,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundImage: profileImageUrl.isNotEmpty
                       ? NetworkImage(
                           profileImageUrl) // Jika URL gambar tersedia
-                      : const AssetImage('img/ashep.png')
+                      : const AssetImage('')
                           as ImageProvider, // Gambar fallback
                 ),
               ),
