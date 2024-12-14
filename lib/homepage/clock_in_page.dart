@@ -8,11 +8,6 @@ import 'package:worktrack/faceRecog.dart';
 import 'package:camera/camera.dart';
 import 'dart:async';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  runApp(ClockInApp());
-}
-
 class ClockInApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -144,7 +139,7 @@ class _ClockInPageState extends State<ClockInPage> {
     final isVerified = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FaceVerificationApp(camera: frontCamera, address: address),
+        builder: (context) => FaceVerificationScreen(camera: frontCamera, address: address),
       ),
     );
   }

@@ -10,29 +10,18 @@ import 'package:worktrack/login.dart';
 import 'dart:async';
 import 'package:dio/dio.dart';
 
-class FaceVerificationApp extends StatelessWidget {
-  final CameraDescription camera;
-  final String address;
-
-  FaceVerificationApp({required this.camera, required this.address});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Face Verification',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: FaceVerificationScreen(camera: camera, address: address),
-    );
-  }
-}
-
 class FaceVerificationScreen extends StatefulWidget {
   final CameraDescription camera;
-  final String address;
+  final String? address;
+  final TextEditingController? titleController;
+  final TextEditingController? descriptionController;
 
-  FaceVerificationScreen({required this.camera, required this.address});
+  FaceVerificationScreen({
+    required this.camera,
+    this.address,
+    this.titleController,
+    this.descriptionController,
+  });
 
   @override
   _FaceVerificationScreenState createState() => _FaceVerificationScreenState();
@@ -126,8 +115,23 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
       });
 
       if (isMatch) {
-        await Future.delayed(Duration(seconds: 4)); // Show success message briefly
-        await clockIn(widget.address);
+        await Future.delayed(Duration(seconds: 4));
+
+        // Proses clock-in jika address tersedia
+        if (widget.address != null) {
+          await clockIn(widget.address!);
+        }
+
+        // Proses clock-out jika titleController dan descriptionController tersedia
+        if (widget.titleController != null &&
+            widget.descriptionController != null) {
+          await clockOut(
+            widget.titleController!.text,
+            widget.descriptionController!.text,
+          );
+        }
+
+        // Navigasi ke HomeScreen setelah proses selesai
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => HomeScreen()),
@@ -144,7 +148,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<Map<String, dynamic>> _sendImageToAPI(File imageFile) async {
     final uri = Uri.parse(
-        "http://192.168.56.1:80/recognize/"); // Android Emulator address
+        "http://192.168.100.67:80/recognize/"); // Android Emulator address
     final request = http.MultipartRequest("POST", uri);
 
     // Add the image file to the request
@@ -192,6 +196,40 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
     }
   }
 
+  Future<void> clockOut(titleController, descriptionController) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final dio = Dio();
+      final response = await dio.post(
+        '${urlDomain}api/absence/clockout',
+        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
+        data: {
+          'activity_title': titleController,
+          'activity_description': descriptionController,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print("Clock-out successful");
+      } else {
+        setState(() {
+          resultMessage = 'Failed to clock out: ${response.data['message']}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        resultMessage = 'An error occurred: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -202,10 +240,10 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-          Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => HomeScreenPage()),
-                );
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HomeScreenPage()),
+            );
           },
         ),
         title: Text(

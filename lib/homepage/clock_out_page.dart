@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:dio/dio.dart';
-import 'package:worktrack/homepage/home_screen.dart';
-import 'package:worktrack/login.dart';
-
-void main() {
-  runApp(ClockOutApp());
-}
+import 'package:worktrack/faceRecog.dart';
+import 'package:camera/camera.dart';
+import 'dart:async';
 
 class ClockOutApp extends StatelessWidget {
   @override
@@ -37,56 +33,48 @@ class _ClockOutPageState extends State<ClockOutPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   bool isLoading = false;
+  CameraDescription? frontCamera;
 
-  Future<void> _clockOut() async {
-    if (!_validateInput()) return;
+  @override
+  void initState() {
+    super.initState();
+    _initializeCamera();
+  }
 
-    setState(() {
-      isLoading = true;
-    });
-
+  Future<void> _initializeCamera() async {
     try {
-      final dio = Dio();
-      final response = await dio.post(
-        '${urlDomain}api/absence/clockout',
-        options: Options(headers: {'Authorization': 'Bearer $authToken'}),
-        data: {
-          'activity_title': _titleController.text,
-          'activity_description': _descriptionController.text,
-        },
+      final cameras = await availableCameras();
+      final camera = cameras.firstWhere(
+        (camera) => camera.lensDirection == CameraLensDirection.front,
+        orElse: () => cameras.first,
       );
 
-      if (response.statusCode == 200) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
-      } else {
-        _showError(response.data['message']);
-      }
-    } catch (e) {
-      _showError('Failed to clock out: $e');
-    } finally {
       setState(() {
-        isLoading = false;
+        frontCamera = camera;
       });
+    } catch (e) {
+      print('Error initializing cameras: $e');
     }
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-  }
-
-  bool _validateInput() {
-    if (_titleController.text.isEmpty) {
-      _showError('Please enter a title for your activity.');
-      return false;
+  void _navigateToFaceRecog() {
+    if (frontCamera != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FaceVerificationScreen(
+            camera: frontCamera!,
+            titleController: _titleController,
+            descriptionController: _descriptionController,
+          ),
+        ),
+      );
+    } else {
+      // Tampilkan pesan error jika kamera tidak tersedia
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Camera not available')),
+      );
     }
-    if (_descriptionController.text.isEmpty) {
-      _showError('Please describe your activity.');
-      return false;
-    }
-    return true;
   }
 
   @override
@@ -127,22 +115,28 @@ class _ClockOutPageState extends State<ClockOutPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                const Text('Title of Your Activity Today', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Title of Your Activity Today',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 TextField(
                   controller: _titleController,
                   decoration: InputDecoration(
                     hintText: 'Enter activity title',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0)),
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text('Describe Your Activity Today', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Describe Your Activity Today',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 TextField(
                   controller: _descriptionController,
                   maxLines: 4,
                   decoration: InputDecoration(
                     hintText: 'Enter activity description',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0)),
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -150,13 +144,17 @@ class _ClockOutPageState extends State<ClockOutPage> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 239, 218, 26),
-                      padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 20),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 100, vertical: 20),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
-                    onPressed: isLoading ? null : _clockOut,
+                    onPressed: isLoading ? null : _navigateToFaceRecog,
                     child: isLoading
                         ? CircularProgressIndicator(color: Colors.white)
-                        : Text('Clock Out', style: TextStyle(color: Colors.white, fontSize: 18)),
+                        : Text('Clock Out',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 18)),
                   ),
                 ),
               ],
@@ -168,7 +166,8 @@ class _ClockOutPageState extends State<ClockOutPage> {
   }
 
   String _formatTime(DateTime dateTime) => DateFormat('HH:mm').format(dateTime);
-  String _formatDate(DateTime dateTime) => DateFormat('EEEE, MMM dd').format(dateTime);
+  String _formatDate(DateTime dateTime) =>
+      DateFormat('EEEE, MMM dd').format(dateTime);
 
   Widget _buildLiveTimeAndDate() {
     return StreamBuilder(
@@ -178,7 +177,9 @@ class _ClockOutPageState extends State<ClockOutPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(_formatTime(now), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(_formatTime(now),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 1),
             Text(_formatDate(now), style: const TextStyle(fontSize: 12)),
           ],
