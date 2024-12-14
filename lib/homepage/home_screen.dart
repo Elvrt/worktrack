@@ -73,8 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
           absence = data['absence'];
 
           // Fetch and set the goal
-          goal = data['goal']?['project_title'] ??
-              'No goal set'; // Adjust this based on the structure of the goal object
+          goal = data['goal']?['project_title'] ??'No goal set'; // Adjust this based on the structure of the goal object
         });
       } else {
         setState(() {
