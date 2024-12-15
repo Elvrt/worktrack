@@ -14,10 +14,6 @@ class ClockOutApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor:
             Colors.white, // Set default background color to white
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white, // Set app bar background to white
-          elevation: 0,
-        ),
       ),
       home: ClockOutPage(),
     );
@@ -84,6 +80,8 @@ class _ClockOutPageState extends State<ClockOutPage> {
         // Ensure the Scaffold background is white
         backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: Colors.white, // Set app bar background to white
+          surfaceTintColor: Colors.transparent,
           toolbarHeight: 100,
           automaticallyImplyLeading: false,
           title: Row(
