@@ -321,7 +321,7 @@ class _ClockInPageState extends State<ClockInPage> {
         if (!snapshot.hasData) return SizedBox.shrink();
 
         final now = snapshot.data!;
-        final time = DateFormat('hh:mm a').format(now);
+        final time = DateFormat('hh:mm:ss a').format(now);
         final date = DateFormat('EEEE, dd MMM yyyy').format(now);
 
         return Column(

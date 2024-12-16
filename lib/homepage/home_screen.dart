@@ -73,7 +73,8 @@ class _HomeScreenState extends State<HomeScreen> {
           absence = data['absence'];
 
           // Fetch and set the goal
-          goal = data['goal']?['project_title'] ??'No goal set'; // Adjust this based on the structure of the goal object
+          goal = data['goal']?['project_title'] ??
+              'No goal set'; // Adjust this based on the structure of the goal object
         });
       } else {
         setState(() {
@@ -177,7 +178,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-<<<<<<< HEAD
   PreferredSize _buildAppBar() {
     return PreferredSize(
       preferredSize: Size.fromHeight(0), // Mengurangi tinggi AppBar
@@ -194,17 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-=======
-PreferredSize _buildAppBar() {
-  return PreferredSize(
-    preferredSize: Size.fromHeight(0), // Mengurangi tinggi AppBar
-    child: AppBar(
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-      backgroundColor: Colors.transparent,
-      flexibleSpace: Container(
-        margin: EdgeInsets.only(bottom: 0), // Mengurangi margin bawah
->>>>>>> 509d08a8fb2e6c29f7888ba8025202017dd2704c
       ),
     );
   }
