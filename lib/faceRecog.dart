@@ -271,17 +271,19 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Container(
+                Center (
+                child: Container(
                   width: 300,
                   height: 400,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey, width: 2),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(10),
                     child: CameraPreview(_controller),
                   ),
+                 ),
                 ),
                 SizedBox(height: 20),
                 isLoading
