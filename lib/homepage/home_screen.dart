@@ -148,56 +148,55 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Colors.white,
-    extendBodyBehindAppBar: true, // Memastikan body meluas di belakang AppBar
-    body: Stack(
-      children: [
-        // Gambar sebagai latar belakang AppBar
-        Positioned(
-          top: 0,
-          left: 0,
-          child: Image.asset(
-            'img/ashep.png', // Path ke gambar
-            width: null, // Menyesuaikan lebar dengan ukuran asli
-            height: null, // Menyesuaikan tinggi dengan ukuran asli
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      extendBodyBehindAppBar: true, // Memastikan body meluas di belakang AppBar
+      body: Stack(
+        children: [
+          // Gambar sebagai latar belakang AppBar
+          Positioned(
+            top: 0,
+            left: 0,
+            child: Image.asset(
+              'img/ashep.png', // Path ke gambar
+              width: null, // Menyesuaikan lebar dengan ukuran asli
+              height: null, // Menyesuaikan tinggi dengan ukuran asli
+            ),
           ),
-        ),
-        // Konten utama
-        Column(
-          children: [
-            _buildAppBar(),
-            // Konten di bawah AppBar
-            Expanded(child: _buildBody(context)),
-          ],
-        ),
-      ],
-    ),
-    bottomNavigationBar: BottomNavBar(currentIndex: 1),
-  );
-}
+          // Konten utama
+          Column(
+            children: [
+              _buildAppBar(),
+              // Konten di bawah AppBar
+              Expanded(child: _buildBody(context)),
+            ],
+          ),
+        ],
+      ),
+      bottomNavigationBar: BottomNavBar(currentIndex: 1),
+    );
+  }
 
-PreferredSize _buildAppBar() {
-  return PreferredSize(
-    preferredSize: Size.fromHeight(0), // Mengurangi tinggi AppBar
-    child: AppBar(
-      elevation: 0,
-      surfaceTintColor: Colors.transparent,
-      backgroundColor: Colors.transparent,
-      flexibleSpace: Container(
-        margin: EdgeInsets.only(bottom: 0), // Mengurangi margin bawah
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(''), // Path ke gambar
-            fit: BoxFit.cover,
+  PreferredSize _buildAppBar() {
+    return PreferredSize(
+      preferredSize: Size.fromHeight(0), // Mengurangi tinggi AppBar
+      child: AppBar(
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          margin: EdgeInsets.only(bottom: 0), // Mengurangi margin bawah
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(''), // Path ke gambar
+              fit: BoxFit.cover,
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildBody(BuildContext context) {
     return SingleChildScrollView(
@@ -396,10 +395,10 @@ PreferredSize _buildAppBar() {
             child: CircleAvatar(
               radius: 25,
               backgroundColor: Colors.grey,
-              child: const Text(
-                'Take Time Off',
-                style: TextStyle(fontSize: 8, color: Colors.white),
-                textAlign: TextAlign.center,
+              child: Image.asset(
+                'img/moon.png', // Gambar ikon
+                width: 20,
+                height: 20,
               ),
             ),
           ),
