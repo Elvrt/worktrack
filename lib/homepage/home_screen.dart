@@ -332,8 +332,8 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           },
           child: Container(
-            width: 162,
-            height: 162,
+            width: 182,
+            height: 182,
             decoration: BoxDecoration(
               gradient: RadialGradient(
                 colors: absence == null
@@ -393,16 +393,28 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
             child: CircleAvatar(
-              radius: 25,
+              radius: 32,
               backgroundColor: Colors.grey,
-              child: Image.asset(
-                'img/moon.png', // Gambar ikon
-                width: 20,
-                height: 20,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 8),
+                  Image.asset(
+                    'img/moon.png', // Gambar ikon moon
+                    width: 20,
+                    height: 20,
+                  ),
+                  Image.asset(
+                    'img/group.png', // Gambar ikon Take Time Off
+                    width: 35,
+                    height: 35,
+                  ),
+                ],
               ),
             ),
           ),
-        ),
+        )
       ],
     );
   }
