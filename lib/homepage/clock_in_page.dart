@@ -128,18 +128,17 @@ class _ClockInPageState extends State<ClockInPage> {
   // Navigate to Face Recognition Screen
   Future<void> navigateToFaceRecognition(
       Position position, String address) async {
-
     final cameras = await availableCameras();
     final frontCamera = cameras.firstWhere(
       (camera) => camera.lensDirection == CameraLensDirection.front,
-      orElse: () =>
-          cameras.first,
+      orElse: () => cameras.first,
     );
 
     final isVerified = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FaceVerificationScreen(camera: frontCamera, address: address),
+        builder: (context) =>
+            FaceVerificationScreen(camera: frontCamera, address: address),
       ),
     );
   }
@@ -321,7 +320,7 @@ class _ClockInPageState extends State<ClockInPage> {
         if (!snapshot.hasData) return SizedBox.shrink();
 
         final now = snapshot.data!;
-        final time = DateFormat('hh:mm:ss a').format(now);
+        final time = DateFormat('hh:mm').format(now);
         final date = DateFormat('EEEE, dd MMM yyyy').format(now);
 
         return Column(
