@@ -392,29 +392,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 MaterialPageRoute(builder: (context) => timeOff()),
               );
             },
-            child: CircleAvatar(
-              radius: 32,
-              backgroundColor: Colors.grey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(height: 8),
-                  Image.asset(
-                    'img/moon.png', // Gambar ikon moon
-                    width: 20,
-                    height: 20,
-                  ),
-                  Image.asset(
-                    'img/group.png', // Gambar ikon Take Time Off
-                    width: 35,
-                    height: 35,
-                  ),
-                ],
+            child: Container(
+              width: 64, // Lebar lingkaran
+              height: 64, // Tinggi lingkaran
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: AssetImage('img/circle.png'),
+                  fit: BoxFit.cover, // Mengatur cara gambar mengisi lingkaran
+                ),
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }

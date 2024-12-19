@@ -90,6 +90,7 @@ flutter:
     - img/applogo.png
     - img/moon.png
     - img/group.png
+    - img/circle.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
