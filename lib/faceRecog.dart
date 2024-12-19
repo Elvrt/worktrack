@@ -148,7 +148,7 @@ class _FaceVerificationScreenState extends State<FaceVerificationScreen> {
 
   Future<Map<String, dynamic>> _sendImageToAPI(File imageFile) async {
     final uri = Uri.parse(
-        "http://192.168.100.67:80/recognize/"); // Android Emulator address
+        "http://192.168.77.83:80/recognize/"); // Android Emulator address
     final request = http.MultipartRequest("POST", uri);
 
     // Add the image file to the request
